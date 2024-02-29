@@ -60,14 +60,14 @@ public final class MecanumDrive {
                 RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
 
         // drive model parameters
-        public double inPerTick = .000759;
-        public double lateralInPerTick = 0.0005591974189404495;
-        public double trackWidthTicks = 15866.495050961883;
+        public double inPerTick = .000747;
+        public double lateralInPerTick = 0.0005114593973507878;
+        public double trackWidthTicks = 15467.006681795221;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.0271036376116331;
-        public double kV = 0.00010660962186178966;
-        public double kA = .000015;
+        public double kS = 0.9509056638430948;
+        public double kV = 0.00010908916932307208;
+        public double kA = 0.0000225;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 60; //40 //60
@@ -75,16 +75,16 @@ public final class MecanumDrive {
         public double maxProfileAccel = 60; //40
 
         // turn profile parameters (in radians)
-        public double maxAngVel = Math.PI; // shared with path
-        public double maxAngAccel = Math.PI;
+        public double maxAngVel = Math.PI*.6; // shared with path //*.8
+        public double maxAngAccel = Math.PI*.8;
 
         // path controller gains
-        public double axialGain = 12.0;
+        public double axialGain = 10.0;
         public double lateralGain = 10.0;
-        public double headingGain = 22.0; // shared with turn
-        public double axialVelGain = 0.001;
-        public double lateralVelGain = 0.01;
-        public double headingVelGain = 0.03; // shared with turn
+        public double headingGain = 15.0; // shared with turn //10 //15
+        public double axialVelGain = 0.0;
+        public double lateralVelGain = 0.0;
+        public double headingVelGain = 0.0; // shared with turn
     }
 
     public static Params PARAMS = new Params();
@@ -110,6 +110,8 @@ public final class MecanumDrive {
 
     public final Localizer localizer;
     public Pose2d pose;
+
+    public boolean useExtraCorrectionLogic = false;
 
     private final LinkedList<Pose2d> poseHistory = new LinkedList<>();
 
@@ -291,19 +293,32 @@ public final class MecanumDrive {
             PoseVelocity2d robotVelRobot = updatePoseEstimate();
             Pose2d error = txWorldTarget.value().minusExp(pose);
 
-            /* Extra correction logic added to get more precise */
-            if ((t >= timeTrajectory.duration
-                    && error.position.norm() < 1  // less than 1 inch error
-                    && Math.toDegrees(error.heading.toDouble()) < 3  // less than 3 degree error
-                    && Math.toDegrees(error.heading.toDouble()) > -3 // less than 3 degree error
-                    && robotVelRobot.linearVel.norm() < 0.5)  // velocity is slow
-                    || t >= timeTrajectory.duration + 0.5) { // max timeout is 0.5 second of extra correction
-                leftFront.setPower(0);
-                leftBack.setPower(0);
-                rightBack.setPower(0);
-                rightFront.setPower(0);
+            if (useExtraCorrectionLogic)
+            {
+                /* Extra correction logic added to get more precise */
+                if ((t >= timeTrajectory.duration
+                        && error.position.norm() < 1  // less than 1 inch error
+                        && Math.toDegrees(error.heading.toDouble()) < 3  // less than 3 degree error
+                        && Math.toDegrees(error.heading.toDouble()) > -3 // less than 3 degree error
+                        && robotVelRobot.linearVel.norm() < 0.5)  // velocity is slow
+                        || t >= timeTrajectory.duration + 0.5) { // max timeout is 0.5 second of extra correction
+                    leftFront.setPower(0);
+                    leftBack.setPower(0);
+                    rightBack.setPower(0);
+                    rightFront.setPower(0);
 
-                return false;
+                    return false;
+                }
+            }
+            else {
+                if (t >= timeTrajectory.duration) {
+                    leftFront.setPower(0);
+                    leftBack.setPower(0);
+                    rightBack.setPower(0);
+                    rightFront.setPower(0);
+
+                    return false;
+                }
             }
 
 

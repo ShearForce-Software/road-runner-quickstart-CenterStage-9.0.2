@@ -16,9 +16,10 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
-    Pose2d stackPose = new Pose2d(-56, -12, Math.toRadians(180));
+    Pose2d stackPose;
     public void runOpMode() {
-        startPose = new Pose2d(-35.5, -62.5, Math.toRadians(90));
+        startPose = new Pose2d(-36, -62.5, Math.toRadians(90));
+        stackPose = new Pose2d(-54.5, -13.5, Math.toRadians(180));
         drive = new MecanumDrive(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
@@ -31,21 +32,21 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
             telemetry.update();
         }
         waitForStart();
-
+/*
         // lock the pixels
         control.GrabPixels();
         control.ReleaseLeft();
-
+*/
         // Drives to left, center, or right positions based on team art location.
         RedLeftTeamArtPixelDelivery();
-
+/*
         // Drop the LEFT pixel (put PURPLE on LEFT, YELLOW on RIGHT) on the line
         control.DropOnLine();
         // put the arm back in a safe to travel position
         control.ResetArmAuto();
         sleep(150);
         control.SlidesDown();
-
+*/
         if(control.autoPosition==2){
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -54,7 +55,7 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
         }
         drive.updatePoseEstimate();
         //control.SpecialSleep(10000);
-        control.SpecialSleep(6000);
+//        control.SpecialSleep(6000);
         control.ServoIntake();
         // drive to stack
         Actions.runBlocking(
@@ -62,14 +63,16 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
                         .splineToLinearHeading(stackPose, Math.toRadians(180))
                         .build()
         );
-        control.StackCorrection();
-        sleep(3000);
+        control.StackCorrectionHL();
+        sleep(10000);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(new Vector2d(drive.pose.position.x + 0.5, drive.pose.position.y + control.stackCorrection), Math.toRadians(180))
                         .build());
-        control.AutoPickupRoutine();
-
+        //control.AutoPickupRoutine();
+        telemetry.update();
+        sleep(10000);
+/*
         // drive to the correct backboard spot based on the team art
         drive.updatePoseEstimate();
         RedBoardDelivery();
@@ -97,7 +100,7 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
         // Return Arm to Ready position
         control.ResetArm();
         sleep(300);
-
+*/
         /*//TEST MULTIPLE CYCLES
         drive.updatePoseEstimate();
         //drive back to stack
@@ -132,7 +135,7 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
 
         sleep(300);
         //END OF TEST MULTIPLE CYCLES*/
-
+/*
         // Move the robot to the parking position
         drive.updatePoseEstimate();
         Actions.runBlocking(
@@ -143,6 +146,8 @@ public class RedFarStackSmoothWithTagCorrection extends LinearOpMode {
         control.ServoStop();
         sleep(100);
         telemetry.update();
+
+ */
     }
     public void RedBoardDelivery() {
         // Look for potential errors

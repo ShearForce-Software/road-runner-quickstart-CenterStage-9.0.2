@@ -322,9 +322,9 @@ public class  UniversalControlClass {
     public void ReadyToLiftSlides(){ // slight move before lifting slides
         armRotLeft.setPosition(.08);
         armRotRight.setPosition(.08);
-        SpecialSleep(150);
-        //wristLeft.setPosition(WRIST_GRAB_PIXEL_POS);
-        //wristRight.setPosition(WRIST_GRAB_PIXEL_POS);
+        //SpecialSleep(150);
+        wristLeft.setPosition(WRIST_GRAB_PIXEL_POS-.02);
+        wristRight.setPosition(WRIST_GRAB_PIXEL_POS-.02);
         //SpecialSleep(150);
     }
 
@@ -342,9 +342,11 @@ public class  UniversalControlClass {
         wristLeft.setPosition(WRIST_DELIVER_TO_BOARD_POS);
         wristRight.setPosition(WRIST_DELIVER_TO_BOARD_POS);
     }
-    public void DeliverPixelToBoardPosTest(){
+    public void DeliverPixelToBoardPosPart1(){
         armRotLeft.setPosition(.57);
         armRotRight.setPosition(.57);
+    }
+    public void DeliverPixelToBoardPosPart2(){
         wristLeft.setPosition(WRIST_DELIVER_TO_BOARD_POS);
         wristRight.setPosition(WRIST_DELIVER_TO_BOARD_POS);
     }
@@ -384,13 +386,26 @@ public class  UniversalControlClass {
             }
         }
     }
-    public void AutoPickupRoutineDrive(){
-        double timeout = opMode.getRuntime() + 1.5;
+    public void AutoPickupRoutineDrive(double wait){
+        double timeout = opMode.getRuntime() + wait;
+        boolean forward = true;
         ServoIntake();
         while(opMode.getRuntime() <= timeout){
-            moveRobot(.5, 0, 0);
             if((leftColorSensor.getDistance(DistanceUnit.MM) < hopperDistance) && (rightColorSensor.getDistance(DistanceUnit.MM) < hopperDistance)) {
                 break;
+            }
+            else if((leftColorSensor.getDistance(DistanceUnit.MM) < hopperDistance) || (rightColorSensor.getDistance(DistanceUnit.MM) < hopperDistance)) {
+                if (forward) {
+                    moveRobot(-.1, 0, 0);
+                    forward = false;
+                }
+                else{
+                    moveRobot(.75, 0, 0);
+                    forward = true;
+                }
+            }
+            else{
+                moveRobot(.65, 0, 0);
             }
             opMode.sleep(100);
         }
@@ -858,7 +873,7 @@ public class  UniversalControlClass {
     public void StackCorrection(){
         List<Recognition> currentRecognitions = tfod.getRecognitions();
 
-        double timeout = opMode.getRuntime() + 5.0;
+        double timeout = opMode.getRuntime() + 1;
         while ((currentRecognitions.size() < 1) && (opMode.getRuntime() < timeout))
         {
             opMode.sleep(50);
@@ -868,6 +883,7 @@ public class  UniversalControlClass {
         if (currentRecognitions.size() < 1)
         {
             opMode.telemetry.addData("WARNING **** - No WHITE Pixels in view - ***** ", currentRecognitions.size());
+            stackCorrection = -1;
         }
         else {
             opMode.telemetry.addData("# Objects Detected", currentRecognitions.size());
@@ -883,10 +899,10 @@ public class  UniversalControlClass {
             stackCorrectionLR = x - 320; // x distance from center of the screen
             stackCorrection = stackCorrectionLR * stackWidth;
 
-            opMode.telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
+            //opMode.telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
             opMode.telemetry.addData("stack image Size:", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
             opMode.telemetry.addData("stack Position:  ", "%.0f / %.0f", x, y);
-            opMode.telemetry.addData("stackCorrection: ", "%.0f / %.0f", stackCorrection);
+            opMode.telemetry.addData("stackCorrection: ", stackCorrection);
             break;
         }
         opMode.telemetry.update();
@@ -894,14 +910,12 @@ public class  UniversalControlClass {
     }
     public void TagCorrection(){
         HuskyLens.Block[] blocks = huskyLens2.blocks();
-
         double timeout = opMode.getRuntime() + 0.15;
-        while ((blocks.length < 1) && (opMode.getRuntime() < timeout))
-        {
+
+        while ((blocks.length < 1) && (opMode.getRuntime() < timeout)) {
             opMode.sleep(50);
             blocks = huskyLens2.blocks();
         }
-
         if (blocks.length > 0){
             double xVal = blocks[0].x;
             pixelCorrectionAmountLR = xVal - 160;
@@ -921,10 +935,47 @@ public class  UniversalControlClass {
             opMode.telemetry.addData("Correction LR: ","%.01f in", distanceCorrectionLR_HL);
             opMode.telemetry.update();
 
-        }else{
+        }
+        else{
             opMode.telemetry.addData("WARNING **** - No April Tags in view - *****",0 );
             opMode.telemetry.update();
+            distanceCorrectionLR_HL = 0.0;
         }
+    }
+    public void StackCorrectionHL(){
+        HuskyLens.Block[] blocks = huskyLens.blocks();
+        double timeout = opMode.getRuntime() + 0.15;
+
+        while ((blocks.length < 1) && (opMode.getRuntime() < timeout)) {
+            opMode.sleep(50);
+            blocks = huskyLens.blocks();
+        }
+        if (blocks.length > 0){
+            double xVal = blocks[0].x;
+            pixelCorrectionAmountLR = xVal - 160;
+
+            double xWidth = blocks[0].width;
+            pixelWidth_HL = 3/xWidth;
+            distanceCorrectionLR_HL = pixelCorrectionAmountLR * pixelWidth_HL;
+
+            opMode.telemetry.addData("Stack width: ", xWidth);
+            opMode.telemetry.addData("pixel width HL: ", "%.04f", pixelWidth_HL);
+
+            hl_halfScreenWidth = pixelWidth_HL * 160;
+            hl_rangeToBoard = (pixelWidth_HL * 160) / Math.tan(Math.toRadians(30));
+
+            opMode.telemetry.addData("HL range to board", "%.01f in", hl_rangeToBoard);
+            opMode.telemetry.addData("HL Half Screen Width", "%.01f in", hl_halfScreenWidth);
+            opMode.telemetry.addData("Correction LR: ","%.01f in", distanceCorrectionLR_HL);
+            opMode.telemetry.update();
+
+        }
+        else{
+            opMode.telemetry.addData("WARNING **** - No Stack in view - *****",0 );
+            opMode.telemetry.update();
+            distanceCorrectionLR_HL = 0.0;
+        }
+
     }
     public void DetectTeamArtBlue() {
         allianceColorIsBlue = true;
