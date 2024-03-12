@@ -21,7 +21,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 //@Disabled
-@Autonomous(name="Red Far Multiple Cycles Actions"/*, preselectTeleOp = "1 Manual Control"*/)
+@Autonomous(name="Red Far Multiple Cycles Actions", preselectTeleOp = "1 Manual Control")
 public class RedFarMultipleCyclesActions extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);
     MecanumDrive drive;
@@ -147,7 +147,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 /* **** Pure strafe out trajectory **** */
                 .strafeToLinearHeading(new Vector2d(45, -11.5), Math.toRadians(180))
                 // Return to stack
-                .strafeToLinearHeading(new Vector2d(-52, stackPose.position.y), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-54, stackPose.position.y), Math.toRadians(180))
                 .build();
 
                 //TODO -- Test if this is more accurate

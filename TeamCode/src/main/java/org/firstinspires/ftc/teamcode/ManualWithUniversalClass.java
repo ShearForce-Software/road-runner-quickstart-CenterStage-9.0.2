@@ -104,6 +104,9 @@ public class ManualWithUniversalClass extends LinearOpMode {
                     theRobot.SpecialSleep(500);
                     theRobot.DeliverPixelToBoardPos();
                 }
+                if (gamepad2.left_stick_button){
+                    theRobot.PickupOne();
+                }
                 // RESET Slides, ARM, and Wrist
                 if (gamepad2.b && !gamepad2.start) {
                     theRobot.ResetArm();

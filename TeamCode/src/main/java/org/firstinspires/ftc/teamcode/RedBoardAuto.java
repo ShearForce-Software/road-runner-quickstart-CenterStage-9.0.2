@@ -53,6 +53,12 @@ public class RedBoardAuto extends LinearOpMode {
         control.SlidesToAuto();
         sleep(150);
         control.DeliverPixelToBoardPos();
+        control.TagCorrection();
+        drive.updatePoseEstimate();
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .build());
         control.StopNearBoardAuto(false);
 
         sleep(200);
@@ -74,7 +80,7 @@ public class RedBoardAuto extends LinearOpMode {
         //sleep (5000);
 
         /* Deliver the Purple Pixel */
-        control.SlidesToAuto(); //TODO TEMP - should be able to remove this once Husky Lens moved
+       // control.SlidesToAuto(); //TODO TEMP - should be able to remove this once Husky Lens moved
         control.DropOnLine();
 
         control.ResetArmAuto();
@@ -103,7 +109,7 @@ public class RedBoardAuto extends LinearOpMode {
     public void RedBoardDelivery() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(47.5,-25,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(47.5,-24,Math.toRadians(180));
             Actions.runBlocking(
                     drive.actionBuilder(startPose)
                             .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
@@ -112,7 +118,7 @@ public class RedBoardAuto extends LinearOpMode {
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(47.5,-35,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(47.5,-37,Math.toRadians(180));
             Actions.runBlocking(
                     drive.actionBuilder(startPose)
                             .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
@@ -121,7 +127,7 @@ public class RedBoardAuto extends LinearOpMode {
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(47.5,-30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(47.5,-32,Math.toRadians(180));
             Actions.runBlocking(
                     drive.actionBuilder(startPose)
                             .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
@@ -131,21 +137,21 @@ public class RedBoardAuto extends LinearOpMode {
     }
     public void RedRightTeamArtPixelDelivery() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(12, -30, Math.toRadians(0));
+            deliverToFloorPose = new Pose2d(13, -30, Math.toRadians(0));
             Actions.runBlocking(
                     drive.actionBuilder(deliverToBoardPose)
                             .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
                             //.setTangent(Math.toRadians(180))
                             .lineToX(0)
                             .lineToX(12)
-                            .strafeTo(new Vector2d(12, -30))
+                            .strafeTo(new Vector2d(13, -30))
                             //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
                             //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
                             .build());
             drive.updatePoseEstimate();
         }
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(11, -36, Math.toRadians(180));
             Actions.runBlocking(
                     drive.actionBuilder(deliverToBoardPose)
                             .setTangent(Math.toRadians(180))
@@ -154,7 +160,7 @@ public class RedBoardAuto extends LinearOpMode {
             drive.updatePoseEstimate();
         }
         else {
-            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(270));
+            deliverToFloorPose = new Pose2d(12, -37, Math.toRadians(270));
             Actions.runBlocking(
                     drive.actionBuilder(deliverToBoardPose)
                             .splineToLinearHeading(new Pose2d(12, -30, Math.toRadians(-90)), Math.toRadians(180))

@@ -368,8 +368,19 @@ public class  UniversalControlClass {
         SpecialSleep(250);
         SlidesDown();
     }
+    public void PickupOne(){
+        opMode.gamepad1.rumble(1000);
+        ServoStop();
+        GrabPixelPos();
+        SpecialSleep(500);
+        GrabPixels();
+        SpecialSleep(750);
+        SetBlinkinToPixelColor();
+        ServoOuttake();
+        ReadyToLiftSlides();
+        AutoIntake = false;
+    }
     public void PickupRoutine(){
-
         if (AutoIntake){
             ServoIntake();
             if((leftColorSensor.getDistance(DistanceUnit.MM) < hopperDistance) && (rightColorSensor.getDistance(DistanceUnit.MM) < hopperDistance)){
@@ -957,6 +968,9 @@ public class  UniversalControlClass {
             double xWidth = blocks[0].width;
             pixelWidth_HL = 3/xWidth;
             distanceCorrectionLR_HL = pixelCorrectionAmountLR * pixelWidth_HL;
+            if(distanceCorrectionLR_HL > 4 || distanceCorrectionLR_HL < -4){
+                distanceCorrectionLR_HL = 0.0;
+            }
 
             opMode.telemetry.addData("Stack width: ", xWidth);
             opMode.telemetry.addData("pixel width HL: ", "%.04f", pixelWidth_HL);

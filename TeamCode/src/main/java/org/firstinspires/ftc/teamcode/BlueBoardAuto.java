@@ -16,6 +16,8 @@ public class BlueBoardAuto extends LinearOpMode {
         startPose = new Pose2d(12, 62.5, Math.toRadians(270));
         drive = new MecanumDrive(hardwareMap, startPose);
         control.Init(hardwareMap);
+        control.HuskyLensInit2();
+        control.HuskyLensInit();
         control.AutoStartPos();
 
         drive.localizer.update();
