@@ -146,9 +146,9 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                 /* **** Curvy spline route out **** */
                 //.splineToLinearHeading(new Pose2d(45, 12, Math.toRadians(180)), Math.toRadians(180))
                 /* **** Pure strafe out trajectory **** */
-                .strafeToLinearHeading(new Vector2d(45, 11), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(45, 11.5), Math.toRadians(180))
                 // Return to stack
-                .strafeToLinearHeading(new Vector2d(-54, 11), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-54, 11.5), Math.toRadians(180))
                 .build();
 
         drive.useExtraCorrectionLogic = true;
@@ -189,7 +189,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(45.5, 36), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(45.5, 26), Math.toRadians(180))
                 .build();
 
         Actions.runBlocking(new SequentialAction(
@@ -272,7 +272,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(-30, 21, Math.toRadians(315));
+            deliverToFloorPose = new Pose2d(-37.5, 22.5, Math.toRadians(315));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(315))
