@@ -928,7 +928,9 @@ public class  UniversalControlClass {
             double xWidth = blocks[0].width;
             pixelWidth_HL = 2/xWidth;
             distanceCorrectionLR_HL = pixelCorrectionAmountLR * pixelWidth_HL;
+            int tagID = blocks[0].id;
 
+            opMode.telemetry.addData("AprilTag ID: ", tagID);
             opMode.telemetry.addData("AprilTag width: ", xWidth);
             opMode.telemetry.addData("pixel width HL: ", "%.04f", pixelWidth_HL);
 
