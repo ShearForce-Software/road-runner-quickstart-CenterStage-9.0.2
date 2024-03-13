@@ -28,12 +28,13 @@ public class MeepMeep_RedFarMultipleCyclesActions {
     static AccelConstraint speedUpAccelerationConstraint;
     static VelConstraint slowDownVelocityConstraint;
     static AccelConstraint slowDownAccelerationConstraint;
+    static int stackY = -12;
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(500);
 
         startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
-        stackPose = new Pose2d(-55.5, -13, Math.toRadians(180));
+        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180));
 
         // Define some custom constraints to use when wanting to go faster than defaults
         speedUpVelocityConstraint = new TranslationalVelConstraint(120.0);
@@ -73,19 +74,19 @@ public class MeepMeep_RedFarMultipleCyclesActions {
         // Build up the Board back to Stack Trajectory
         Action DriveBackToStack = myBot.getDrive().actionBuilder(new Pose2d(46, deliverToBoardPose.position.y, Math.toRadians(180)))
                 /* **** Curvy spline route out **** */
-                .splineToLinearHeading(new Pose2d(45, -11.5, Math.toRadians(180)), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
+                .splineToLinearHeading(new Pose2d(45, stackY, Math.toRadians(180)), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 /* **** Pure strafe out trajectory **** */
-                //.strafeToLinearHeading(new Vector2d(45, -11.5), Math.toRadians(180))
+                //.strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
                 // Return to stack
                 .splineToLinearHeading(stackPose, Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
-                //.strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
+                //.strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 //.lineToX(-60.5, slowDownVelocityConstraint)
                 .build();
 
         // Build up the Stack to Board Position 1 Trajectory
         Action BoardTrajFinal = myBot.getDrive().actionBuilder(stackPose)
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(45.5, -12, Math.toRadians(180)), Math.toRadians(0), speedUpVelocityConstraint, speedUpAccelerationConstraint)
+                .splineToLinearHeading(new Pose2d(45.5, stackY, Math.toRadians(180)), Math.toRadians(0), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 //.setTangent(Math.toRadians(270))
                 .splineToLinearHeading(new Pose2d(47, -36, Math.toRadians(180)), Math.toRadians(270), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 .build();
@@ -98,12 +99,12 @@ public class MeepMeep_RedFarMultipleCyclesActions {
         // Build up the Board back to Stack Trajectory
         Action DriveBackToStack2 = myBot.getDrive().actionBuilder(new Pose2d(46, -36, Math.toRadians(180)))
                 /* **** Curvy spline route out **** */
-                .splineToLinearHeading(new Pose2d(45, -11.5, Math.toRadians(180)), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
+                .splineToLinearHeading(new Pose2d(45, stackY, Math.toRadians(180)), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 /* **** Pure strafe out trajectory **** */
-                //.strafeToLinearHeading(new Vector2d(45, -11.5), Math.toRadians(180))
+                //.strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
                 // Return to stack
                 .splineToLinearHeading(stackPose, Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
-                //.strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
+                //.strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 //.lineToX(-60.5, slowDownVelocityConstraint)
                 .build();
 
@@ -216,7 +217,7 @@ public class MeepMeep_RedFarMultipleCyclesActions {
         }
         BoardTraj2 = myBot.getDrive().actionBuilder(stackPose)
                 .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, -12), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
+                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180), speedUpVelocityConstraint, speedUpAccelerationConstraint)
                 /* **** Curvy spline route without swipe **** */
                 .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
