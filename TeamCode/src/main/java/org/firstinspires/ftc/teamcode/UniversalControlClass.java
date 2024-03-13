@@ -702,16 +702,10 @@ public class  UniversalControlClass {
             moveRobot(-.55,0.0,0);
             ShowSlideTelemetry();
             opMode.sleep(100);
-            if(clawDistanceSensor.getDistance(DistanceUnit.MM) <= 50){
-                moveRobot(0.0,0.0,0);
-                opMode.sleep(100);
-                ReleaseLeft();
-                if (releaseBoth) ReleaseRight();
-                break;
-            }
-            ReleaseLeft();
-            if (releaseBoth) ReleaseRight();
         }
+        moveRobot(0.0,0.0,0);
+        ReleaseLeft();
+        if (releaseBoth) ReleaseRight();
     }
     public void moveRobot(double x, double y, double yaw) {
         opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
