@@ -185,13 +185,14 @@ public class BlueFarWORLDS extends LinearOpMode {
 
         //drive to position 3
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
+                //.lineToX(-56, slowDownVelocityConstraint)
                 //.strafeToLinearHeading(new Vector2d(44, 11), Math.toRadians(180))
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(45.5, 26), Math.toRadians(180))
                 .build();
 

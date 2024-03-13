@@ -182,13 +182,13 @@ public class RedFarWORLDS extends LinearOpMode {
 
         //drive to position 1
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180))
+//                .lineToX(-56, slowDownVelocityConstraint)
                 //.strafeToLinearHeading(new Vector2d(45.5, -11), Math.toRadians(180))
-                /* **** Curvy spline route without swipe **** */
-                //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(47.5, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(47.5, -36), Math.toRadians(180))
                 .build();
 
@@ -252,7 +252,8 @@ public class RedFarWORLDS extends LinearOpMode {
             deliverToBoardPose = new Pose2d(46,-36,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
+                //.lineToX(-56, slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180))
