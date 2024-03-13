@@ -54,6 +54,7 @@ public class  UniversalControlClass {
     HuskyLens huskyLens;
     HuskyLens huskyLens2;
     IMU imu;
+    public double imu_offsetInDegrees;
     Servo   grabberLeft;
     Servo   grabberRight;
     Servo armRotRight;
@@ -871,8 +872,7 @@ public class  UniversalControlClass {
         } else {
             opMode.telemetry.addData(">>", "Press start to continue");
         }
-        huskyLens2.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION
-        );
+        huskyLens2.selectAlgorithm(HuskyLens.Algorithm.TAG_RECOGNITION);
         opMode.telemetry.update();
     }
     public void StackCorrection(){
@@ -1185,6 +1185,14 @@ public class  UniversalControlClass {
         leftRear.setPower(backLeftPower*.25);
         rightFront.setPower(frontRightPower*.25);
         rightRear.setPower(backRightPower*.25);
+    }
+
+    public double GetIMU_HeadingInDegrees()
+    {
+        double botHeading = AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imu_offsetInDegrees);
+
+        return botHeading;
+
     }
     public void driveControlsFieldCentric() {
         double y = -opMode.gamepad1.left_stick_y;
