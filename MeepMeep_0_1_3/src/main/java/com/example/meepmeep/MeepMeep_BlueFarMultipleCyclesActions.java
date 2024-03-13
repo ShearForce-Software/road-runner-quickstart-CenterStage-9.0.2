@@ -87,9 +87,9 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
                 .lineToX(-56, slowDownVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(45.5, 12), Math.toRadians(180))
                 /* **** Curvy spline route without swipe **** */
-                //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(47.5, 22, Math.toRadians(180)), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(47.5, 24), Math.toRadians(180))
+                //.strafeToLinearHeading(new Vector2d(47.5, 24), Math.toRadians(180))
                 .build();
 
         // Build up the Board position 3 to Parking Trajectory
@@ -185,9 +185,9 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
                 .lineToX(-56, slowDownVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(45.5, 12), Math.toRadians(180))
                 /* **** Curvy spline route without swipe **** */
-                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
+                //.strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
                 .build();
     }
 
