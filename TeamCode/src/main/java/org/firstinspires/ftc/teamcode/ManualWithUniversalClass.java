@@ -51,6 +51,9 @@ public class ManualWithUniversalClass extends LinearOpMode {
                     // Auto drives to the board using the arm distance sensor
                     theRobot.StopNearBoard();
                 }
+                if(gamepad1.y){
+                    theRobot.imu.resetYaw();
+                }
                 if (gamepad1.left_trigger != 0) {
                     theRobot.SetScissorLiftPower(gamepad1.left_trigger);
                 } else if (gamepad1.right_trigger != 0) {

@@ -8,6 +8,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.TankDrive;
@@ -18,8 +19,10 @@ public class LocalizationTest extends LinearOpMode {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
-            //Red Far Start Position
-            MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,62.5,Math.toRadians(270)));
+            //Red Far Start Position startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
+            MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,-62.5,Math.toRadians(90)));
+            drive.lazyImu.get().resetYaw();
+            //TODO set yaw to 90
 
             waitForStart();
 
@@ -33,10 +36,14 @@ public class LocalizationTest extends LinearOpMode {
                 ));
 
                 drive.updatePoseEstimate();
+                if(gamepad1.y) {
+                    drive.lazyImu.get().resetYaw();
+                }
 
                 telemetry.addData("x", drive.pose.position.x);
                 telemetry.addData("y", drive.pose.position.y);
                 telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
+                telemetry.addData("imu heading (deg)", (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)));
                 telemetry.update();
 
                 TelemetryPacket packet = new TelemetryPacket();
