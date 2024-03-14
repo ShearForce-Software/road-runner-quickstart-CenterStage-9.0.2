@@ -98,7 +98,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         RedBoardDecision(); // updates BoardTraj2
         Actions.runBlocking(new SequentialAction(
                 autoGrab1(),
-                new SleepAction(.5),
+                new SleepAction(.25),
                 new ParallelAction(
                         new SequentialAction(
                                 autoGrab2(),
@@ -194,7 +194,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
                         autoGrab1(),
-                        new SleepAction(.5),
+                        new SleepAction(.25),
                         new ParallelAction(
                                 new SequentialAction(
                                         autoGrab2(),
@@ -216,7 +216,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150);
+        sleep(75);
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
@@ -235,6 +235,9 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                         servoStop()
                 )
         );
+        double timeLeft = 30.0-getRuntime();
+        telemetry.addData("Time left", timeLeft);
+        telemetry.update();
     }
 
     public void RedBoardDecision() {

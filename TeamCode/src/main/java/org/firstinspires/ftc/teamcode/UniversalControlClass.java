@@ -289,7 +289,7 @@ public class  UniversalControlClass {
 
         // release the purple pixel
         grabberRight.setPosition(0);
-        SpecialSleep(200);
+        SpecialSleep(100);
 
         // Move the arm and wrist slightly up so the grabber servo is clear of the pixel, so doesn't fly out when the arm is reset
         armRotLeft.setPosition(.7);
