@@ -82,6 +82,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                                 FloorTraj),
                         /* Deliver the Purple Pixel */
                         dropOnLine(), //TODO -- takes too long, need to see if can split up and make parts of it parallel
+                        /* Drive to the stack of white pixels */
                         new ParallelAction(
                                 resetArm(),
                                 servoIntake(),
@@ -219,7 +220,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150);
+        sleep(150); //TODO can we remove this sleep, the earlier delivery doesn't have a sleep
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)

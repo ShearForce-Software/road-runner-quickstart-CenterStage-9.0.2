@@ -275,7 +275,7 @@ public class  UniversalControlClass {
         // move the arm to just off of the floor -- candidate part to do in parallel
         armRotLeft.setPosition(.72);
         armRotRight.setPosition(.72);
-        SpecialSleep(200);
+        SpecialSleep(200);  //TODO -- Test if we can remove this sleep
 
         // move the wrist to put the purple pixel on the floor
         wristLeft.setPosition(.85);
@@ -284,14 +284,14 @@ public class  UniversalControlClass {
 
         // release the purple pixel
         grabberRight.setPosition(0);
-        SpecialSleep(200);
+        SpecialSleep(200); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
 
         // Move the arm and wrist slightly up so the grabber servo is clear of the pixel, so doesn't fly out when the arm is reset
         armRotLeft.setPosition(.7);
         armRotRight.setPosition(.7);
         wristLeft.setPosition(.83);
         wristRight.setPosition(.83);
-        SpecialSleep(200);
+        SpecialSleep(200); //TODO -- see how low we can make this sleep without flinging (was 200 at state)
     }
     public void SafeStow(){
         grabberLeft.setPosition(.72);
