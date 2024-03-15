@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.MecanumDrive.PARAMS;
 
-import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -11,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -19,7 +16,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -29,7 +25,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 @Config
@@ -54,7 +49,7 @@ public class  UniversalControlClass {
     HuskyLens huskyLens;
     HuskyLens huskyLens2;
     IMU imu;
-    public double imu_offsetInDegrees;
+    public double imuOffsetInDegrees;
     Servo   grabberLeft;
     Servo   grabberRight;
     Servo armRotRight;
@@ -681,6 +676,11 @@ public class  UniversalControlClass {
         opMode.telemetry.update();
     }
 
+    public void ShowAutonomousData(){
+      opMode.telemetry.addData("imu Heading: ", GetIMU_HeadingInDegrees());
+      opMode.telemetry.update();
+    }
+
     public void StopNearBoard(){
         double timeout = opMode.getRuntime() + 3;
         while((clawDistanceSensor.getDistance(DistanceUnit.MM) > 78) && (opMode.getRuntime() < timeout)){
@@ -1191,7 +1191,7 @@ public class  UniversalControlClass {
 
     public double GetIMU_HeadingInDegrees()
     {
-        double botHeading = AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imu_offsetInDegrees);
+        double botHeading = AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imuOffsetInDegrees);
 
         return botHeading;
 
