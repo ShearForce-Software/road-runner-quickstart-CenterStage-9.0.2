@@ -89,7 +89,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 )
         );
         drive.updatePoseEstimate();
-
+        double timeLeft = 30-getRuntime();
+        telemetry.addData("Time left", timeLeft);
         /* Pick up a White Pixel from the stack */
         control.AutoPickupRoutineDrive(1.5);
         drive.updatePoseEstimate();
@@ -98,7 +99,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         RedBoardDecision(); // updates BoardTraj2
         Actions.runBlocking(new SequentialAction(
                 autoGrab1(),
-                new SleepAction(.5),
+                new SleepAction(.25),
                 new ParallelAction(
                         new SequentialAction(
                                 autoGrab2(),
@@ -194,7 +195,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
                         autoGrab1(),
-                        new SleepAction(.5),
+                        new SleepAction(.25),
                         new ParallelAction(
                                 new SequentialAction(
                                         autoGrab2(),
@@ -211,7 +212,9 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                                 )
                         )
                 )
+
         );
+        telemetry.update();
 
         //deliver two white pixels
         control.StopNearBoardAuto(true);
@@ -235,6 +238,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                         servoStop()
                 )
         );
+
+        telemetry.update();
     }
 
     public void RedBoardDecision() {
