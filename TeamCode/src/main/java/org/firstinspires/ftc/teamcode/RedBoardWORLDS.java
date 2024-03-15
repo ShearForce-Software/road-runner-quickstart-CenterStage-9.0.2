@@ -16,8 +16,9 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous(name="Red Board Cycle Actions", preselectTeleOp = "1 Manual Control")
-public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
+//@Disabled
+@Autonomous(name="Red Board WORLDS", preselectTeleOp = "1 Manual Control")
+public class RedBoardWORLDS extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);
     MecanumDrive drive;
     Pose2d startPose;
@@ -33,14 +34,14 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    int stackY = -12;
+    int stackY = -36;
 
     public void runOpMode(){
-        startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
+        startPose = new Pose2d(12,-62.5,Math.toRadians(90));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75, 75);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
@@ -108,8 +109,9 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         if (control.autoPosition == 1)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .splineToLinearHeading(new Pose2d(12,-62, Math.toRadians(180)), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,-62), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(12,-56, Math.toRadians(180)), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,-56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180), speedUpVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
                     .build();
 
@@ -117,8 +119,8 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         else
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,-62), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,-62), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,-56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
                     .build();
         }
@@ -138,15 +140,15 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
                                 resetArm(),
                                 servoIntake(),
                                 DriveToStack)
-                        )
+                )
         );
         drive.updatePoseEstimate();
 
-        control.StackCorrection();
+        control.StackCorrectionHL();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y + control.stackCorrection), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build()
         );
         drive.updatePoseEstimate();
@@ -196,7 +198,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
                 .lineToX(45, slowDownVelocityConstraint)
-                .splineToLinearHeading(new Pose2d(48, -60, Math.toRadians(90)), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(48, -56, Math.toRadians(90)), Math.toRadians(90))
                 .build();
         Actions.runBlocking(
                 new ParallelAction(
@@ -234,13 +236,13 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         if (control.autoPosition == 1) {
             deliverToFloorPose = new Pose2d(12, -33, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                            .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
-                            //.setTangent(Math.toRadians(180))
-                            .lineToX(0)
-                            .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
-                            //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
-                            //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
-                            .build();
+                    .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
+                    //.setTangent(Math.toRadians(180))
+                    .lineToX(0)
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
+                    //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
+                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
+                    .build();
         }
         else if (control.autoPosition == 3) {
             deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(180));
@@ -257,21 +259,20 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
                     .build();
         }
     }
-    public Action lockPixels(){return new RedBoardAutoMultipleCyclesActions.LockPixels();}
+    public Action lockPixels(){return new RedBoardWORLDS.LockPixels();}
     public class LockPixels implements Action{
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 control.GrabPixels();
-                control.ReleaseLeft();
                 initialized = true;
             }
             packet.put("lock purple pixel", 0);
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action dropOnLine(){return new RedBoardAutoMultipleCyclesActions.DropOnLine();}
+    public Action dropOnLine(){return new RedBoardWORLDS.DropOnLine();}
     public class DropOnLine implements Action{
         private boolean initialized = false;
         @Override
@@ -284,7 +285,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action resetArm(){return new RedBoardAutoMultipleCyclesActions.ResetArm();}
+    public Action resetArm(){return new RedBoardWORLDS.ResetArm();}
     public class ResetArm implements Action{
         private boolean initialized = false;
         @Override
@@ -297,7 +298,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action slidesDown(){return new RedBoardAutoMultipleCyclesActions.SlidesDown();}
+    public Action slidesDown(){return new RedBoardWORLDS.SlidesDown();}
     public class SlidesDown implements Action{
         private boolean initialized = false;
         @Override
@@ -310,7 +311,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab1(){return new RedBoardAutoMultipleCyclesActions.AutoGrab1();}
+    public Action autoGrab1(){return new RedBoardWORLDS.AutoGrab1();}
     public class AutoGrab1 implements Action{
         private boolean initialized = false;
         @Override
@@ -323,7 +324,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab2(){return new RedBoardAutoMultipleCyclesActions.AutoGrab2();}
+    public Action autoGrab2(){return new RedBoardWORLDS.AutoGrab2();}
     public class AutoGrab2 implements Action{
         private boolean initialized = false;
         @Override
@@ -336,7 +337,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoOuttake(){return new RedBoardAutoMultipleCyclesActions.ServoOuttake();}
+    public Action servoOuttake(){return new RedBoardWORLDS.ServoOuttake();}
     public class ServoOuttake implements Action{
         private boolean initialized = false;
         @Override
@@ -349,7 +350,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoIntake(){return new RedBoardAutoMultipleCyclesActions.ServoIntake();}
+    public Action servoIntake(){return new RedBoardWORLDS.ServoIntake();}
     public class ServoIntake implements Action{
         private boolean initialized = false;
         @Override
@@ -362,7 +363,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger1(){return new RedBoardAutoMultipleCyclesActions.HalfwayTrigger1();}
+    public Action halfwayTrigger1(){return new RedBoardWORLDS.HalfwayTrigger1();}
     public class HalfwayTrigger1 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -375,7 +376,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger2(){return new RedBoardAutoMultipleCyclesActions.HalfwayTrigger2();}
+    public Action halfwayTrigger2(){return new RedBoardWORLDS.HalfwayTrigger2();}
     public class HalfwayTrigger2 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -388,7 +389,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger3(){return new RedBoardAutoMultipleCyclesActions.HalfwayTrigger3();}
+    public Action halfwayTrigger3(){return new RedBoardWORLDS.HalfwayTrigger3();}
     public class HalfwayTrigger3 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -401,7 +402,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoStop(){return new RedBoardAutoMultipleCyclesActions.ServoStop();}
+    public Action servoStop(){return new RedBoardWORLDS.ServoStop();}
     public class ServoStop implements Action{
         private boolean initialized = false;
         @Override
@@ -415,3 +416,4 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         }
     }
 }
+
