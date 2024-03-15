@@ -88,11 +88,13 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         );
 
         drive.updatePoseEstimate();
-        // *******************************************************************
-        // ********** CREATE A NEW MECANUM DRIVE to correct HEADING DRIFT ****
-        // *******************************************************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(-55.5, stackY, control.GetIMU_HeadingInDegrees()));
+        // *****************************
+        // ** ROADRUNNER RESET *********
+        // ** Corrects heading only ****
+        // *****************************
+        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, drive.pose.position.y, control.GetIMU_HeadingInDegrees())); //TODO Fix this Degrees to Radians needed
         control.ShowAutonomousData();
+        drive.updatePoseEstimate();
 
 
         /* Pick up a White Pixel from the stack */
@@ -130,8 +132,13 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                         .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build());
         drive.updatePoseEstimate();
-        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, deliverToBoardPose.position.y, control.GetIMU_HeadingInDegrees()));
+        // *****************************
+        // ** ROADRUNNER RESET *********
+        // ** correct y and heading ****
+        // *****************************
+        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, deliverToBoardPose.position.y, control.GetIMU_HeadingInDegrees()));  //TODO Fix this Degrees to Radians needed
         control.ShowAutonomousData();
+        drive.updatePoseEstimate();
 
 
         /* release pixels on the board using the distance sensor to know when to stop */
@@ -184,8 +191,13 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                         .build()
         );
         drive.updatePoseEstimate();
-        drive = new MecanumDrive(hardwareMap, new Pose2d(-58, stackY, control.GetIMU_HeadingInDegrees()));
+        // *****************************
+        // ** ROADRUNNER RESET *********
+        // ** correct y and heading ****
+        // *****************************
+        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, stackY, control.GetIMU_HeadingInDegrees())); //TODO Fix this Degrees to Radians needed
         control.ShowAutonomousData();
+        drive.updatePoseEstimate();
 
 
         //grab 2 more white pixels

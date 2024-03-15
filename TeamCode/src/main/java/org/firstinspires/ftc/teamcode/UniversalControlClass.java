@@ -30,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 @Config
 public class  UniversalControlClass {
     LinearOpMode opMode;
-    //TODO: Create Motors, sensors, and servos
     DcMotor leftFront;
     DcMotor leftRear;
     DcMotor rightFront;
@@ -62,7 +61,6 @@ public class  UniversalControlClass {
     RevBlinkinLedDriver blinkinLedDriverLeft;
     RevBlinkinLedDriver blinkinLedDriverRight;
 
-    //TODO: set universal variables (public static to make available in dashboard
     boolean IsDriverControl;
     boolean IsFieldCentric;
     int hopperDistance = 30;
@@ -120,14 +118,12 @@ public class  UniversalControlClass {
     int blueRight = 0;
     public static boolean allianceColorIsBlue = false;
 
-    //TODO: Add any other specification variables
     public UniversalControlClass(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
         this.IsFieldCentric = isFieldCentric;
         this.opMode = opMode;
     }
     public void Init (HardwareMap hardwareMap) {
-        //TODO: hardware map all servos, motors, sensors, and cameras
         leftFront = hardwareMap.get(DcMotor.class, "leftFront_leftOdometry");
         leftRear = hardwareMap.get(DcMotor.class, "leftRear");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
@@ -164,7 +160,6 @@ public class  UniversalControlClass {
         huskyLens = hardwareMap.get(HuskyLens.class, "huskyLens1");
         huskyLens2 = hardwareMap.get(HuskyLens.class, "huskyLens2");
 
-        //TODO: set motor direction, zero power brake behavior, stop and reset encoders, etc
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
         armRotLeft.setDirection(Servo.Direction.FORWARD);  // Updated for Axon: To FORWARD
@@ -645,7 +640,6 @@ public class  UniversalControlClass {
         return slidesAllDown;
     }
     public void SetSlidePower(double power){
-        //TODO: CLAIRE slides w/ limit switch
         if ((leftSlideLimit.isPressed() && power < 0) || (rightSlideLimit.isPressed() && power < 0))
         {
             slidePower = 0;

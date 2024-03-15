@@ -90,7 +90,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 )
         );
         drive.updatePoseEstimate();
-        double timeLeft = 30-getRuntime();
+        double timeLeft = 30-getRuntime();  //TODO -- these two lines should be at the bottom of the routine not near the start
         telemetry.addData("Time left", timeLeft);
         /* Pick up a White Pixel from the stack */
         control.AutoPickupRoutineDrive(1.5);
@@ -220,7 +220,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150); //TODO can we remove this sleep, the earlier delivery doesn't have a sleep
+        sleep(150); //TODO can we remove this sleep, the earlier delivery doesn't have a sleep, does it need one?
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
