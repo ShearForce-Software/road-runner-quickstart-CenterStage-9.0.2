@@ -92,7 +92,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         // ** ROADRUNNER RESET *********
         // ** Corrects heading only ****
         // *****************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, drive.pose.position.y, control.GetIMU_HeadingInDegrees())); //TODO Fix this Degrees to Radians needed
+        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, drive.pose.position.y, Math.toRadians(control.GetIMU_HeadingInDegrees()))); //TODO Fix this Degrees to Radians needed
         control.ShowAutonomousData();
         drive.updatePoseEstimate();
 
@@ -136,7 +136,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         // ** ROADRUNNER RESET *********
         // ** correct y and heading ****
         // *****************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, deliverToBoardPose.position.y, control.GetIMU_HeadingInDegrees()));  //TODO Fix this Degrees to Radians needed
+        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, deliverToBoardPose.position.y, Math.toRadians(control.GetIMU_HeadingInDegrees())));  //TODO Fix this Degrees to Radians needed
         control.ShowAutonomousData();
         drive.updatePoseEstimate();
 
@@ -195,7 +195,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         // ** ROADRUNNER RESET *********
         // ** correct y and heading ****
         // *****************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, stackY, control.GetIMU_HeadingInDegrees())); //TODO Fix this Degrees to Radians needed
+        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, stackY, Math.toRadians( control.GetIMU_HeadingInDegrees()))); //TODO Fix this Degrees to Radians needed
         control.ShowAutonomousData();
         drive.updatePoseEstimate();
 
