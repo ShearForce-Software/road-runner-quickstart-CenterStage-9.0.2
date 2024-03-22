@@ -33,10 +33,11 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
+    int stackY = -12;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
-        stackPose = new Pose2d(-55.5, -13, Math.toRadians(180)); //-54.5,-11.5
+        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
         speedUpVelocityConstraint = new TranslationalVelConstraint(90.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
         speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
@@ -47,7 +48,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
-        control.WebcamInit(hardwareMap);
+        //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
 
@@ -210,9 +211,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
                 )
         );
         telemetry.update();
-
     }
-
     public void RedBoardDecision() {
         // Look for potential errors
         //***POSITION 1***

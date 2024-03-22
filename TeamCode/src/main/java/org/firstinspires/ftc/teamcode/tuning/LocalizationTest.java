@@ -14,6 +14,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.TankDrive;
 
 public class LocalizationTest extends LinearOpMode {
+    double imuOffset = .0;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -22,7 +23,9 @@ public class LocalizationTest extends LinearOpMode {
             //Red Far Start Position startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
             MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,-62.5,Math.toRadians(90)));
             drive.lazyImu.get().resetYaw();
+            imuOffset = 90.0;
             //TODO set yaw to 90
+
 
             waitForStart();
 
@@ -40,10 +43,12 @@ public class LocalizationTest extends LinearOpMode {
                     drive.lazyImu.get().resetYaw();
                 }
 
+                double imuHeading = AngleUnit.normalizeDegrees(drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imuOffset);
+
                 telemetry.addData("x", drive.pose.position.x);
                 telemetry.addData("y", drive.pose.position.y);
                 telemetry.addData("heading (deg)", Math.toDegrees(drive.pose.heading.toDouble()));
-                telemetry.addData("imu heading (deg)", (drive.lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)));
+                telemetry.addData("imu heading (deg)", (imuHeading));
                 telemetry.update();
 
                 TelemetryPacket packet = new TelemetryPacket();

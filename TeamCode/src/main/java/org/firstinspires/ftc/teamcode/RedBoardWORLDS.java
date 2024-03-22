@@ -4,13 +4,9 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.AccelConstraint;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Pose2dDual;
-import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.ProfileAccelConstraint;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.TranslationalVelConstraint;
@@ -21,8 +17,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 //@Disabled
-@Autonomous(name="Red Far Multiple Cycles Actions", preselectTeleOp = "1 Manual Control")
-public class RedFarMultipleCyclesActions extends LinearOpMode {
+@Autonomous(name="Red Board WORLDS", preselectTeleOp = "1 Manual Control")
+public class RedBoardWORLDS extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);
     MecanumDrive drive;
     Pose2d startPose;
@@ -38,14 +34,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    int stackY = -12;
+    int stackY = -36;
 
     public void runOpMode(){
-        startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
+        startPose = new Pose2d(12,-62.5,Math.toRadians(90));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75, 75);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
@@ -53,156 +49,27 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
-        control.HuskyLensInit2();
         //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
 
         while(!isStarted()){
-            control.DetectTeamArtRed();
-            telemetry.update();//make decisions
-            RedLeftPurplePixelDecision();
+            control.DetectTeamArtRedBoard();
+            telemetry.update();
         }
         resetRuntime();
-
-        // Create the floor to Stack trajectory
-        DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                .splineToLinearHeading(stackPose, Math.toRadians(180))
-                .lineToX(-57, slowDownVelocityConstraint)
-                .build();
 
         // ***************************************************
         // ****  START DRIVING    ****************************
         // ***************************************************
+
+        RedBoardDecision();
+        /* Drive to the Board */
         Actions.runBlocking(
                 new SequentialAction(
-                        /* Drive to Floor Position */
+                        lockPixels(),
+                        /* Drive to the board while moving arm up to scoring position after crossing the half-way point */
                         new ParallelAction(
-                                lockPixels(),
-                                FloorTraj),
-                        /* Deliver the Purple Pixel */
-                        dropOnLine(), //TODO -- takes too long, need to see if can split up and make parts of it parallel
-                        /* Drive to the stack of white pixels */
-                        new ParallelAction(
-                                resetArm(),
-                                servoIntake(),
-                                DriveToStack)
-                )
-        );
-        drive.updatePoseEstimate();
-        double timeLeft = 30-getRuntime();  //TODO -- these two lines should be at the bottom of the routine not near the start
-        telemetry.addData("Time left", timeLeft);
-        /* Pick up a White Pixel from the stack */
-        control.AutoPickupRoutineDrive(1.5);
-        drive.updatePoseEstimate();
-
-        /* Drive to the board while moving arm up to scoring position after crossing the half-way point */
-        RedBoardDecision(); // updates BoardTraj2
-        Actions.runBlocking(new SequentialAction(
-                autoGrab1(),
-                new SleepAction(.25),
-                new ParallelAction(
-                        new SequentialAction(
-                                autoGrab2(),
-                                new SleepAction(.15),
-                                servoOuttake()
-                        ),
-                        BoardTraj2,
-                        new SequentialAction(
-                                halfwayTrigger1(),
-                                new SleepAction(.15),
-                                halfwayTrigger2(),
-                                new SleepAction(.15),
-                                halfwayTrigger3()
-                                )
-                        )
-                )
-        );
-
-        /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrection();
-        drive.updatePoseEstimate();
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
-                        .build());
-
-        /* release pixels on the board using the distance sensor to know when to stop */
-        control.StopNearBoardAuto(true);
-
-        /* BACK UP FROM BOARD slightly so that the pixels fall off cleanly */
-        drive.updatePoseEstimate();
-        Actions.runBlocking(
-            drive.actionBuilder(drive.pose)
-                .lineToX(46)
-                .build());
-
-        // **********************************************************
-        // ******    Begin Logic to get an extra 2 White Pixels *****
-        // **********************************************************
-        /* move arm to reset position while strafing to the side, before driving back to the stack of white pixels */
-        drive.updatePoseEstimate();
-        DriveBackToStack = drive.actionBuilder(drive.pose)
-                /* **** Curvy spline route out **** */
-                //TODO -- Test if this is more accurate
-                //.splineToLinearHeading(new Pose2d(45, stackY, Math.toRadians(180)), Math.toRadians(180))
-                //.splineToLinearHeading(stackPose, Math.toRadians(180))
-                /* **** Pure strafe out trajectory **** */
-                .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
-                // Return to stack
-                .strafeToLinearHeading(new Vector2d(-54, stackY-1.5), Math.toRadians(180))
-                .build();
-
-                //TODO -- Test if this is more accurate
-                //drive.useExtraCorrectionLogic = true;
-        Actions.runBlocking(
-                new ParallelAction(
-                        DriveBackToStack,
-                        new SequentialAction(
-                                resetArm(),
-                                new SleepAction(.15),
-                                slidesDown()
-                        ),
-                        servoIntake()
-                )
-        );
-        drive.useExtraCorrectionLogic = false;
-
-
-        /* Use camera to make a minor adjustment to position if needed */
-        control.StackCorrectionHL();
-        drive.updatePoseEstimate();
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
-                        .build()
-        );
-        drive.updatePoseEstimate();
-
-        //grab 2 more white pixels
-        control.AutoPickupRoutineDrive(2.0);
-        sleep(200);
-        drive.updatePoseEstimate();
-
-        //drive to position 1
-        BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180))
-                /* **** Curvy spline route without swipe **** */
-                //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
-                /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(47.5, -36), Math.toRadians(180))
-                .build();
-
-        Actions.runBlocking(new SequentialAction(
-                        autoGrab1(),
-                        new SleepAction(.25),
-                        new ParallelAction(
-                                new SequentialAction(
-                                        autoGrab2(),
-                                        new SleepAction(.15),
-                                        servoOuttake()
-                                        ),
                                 BoardTraj2,
                                 new SequentialAction(
                                         halfwayTrigger1(),
@@ -213,19 +80,125 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                                 )
                         )
                 )
-
         );
-        telemetry.update();
+
+        /* Use AprilTags to Align Perfectly to the Board */
+        control.TagCorrection();
+        drive.updatePoseEstimate();
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .build());
+
+        /* release pixels on the board using the distance sensor to know when to stop */
+        control.StopNearBoardAuto(false);
+
+        /* BACK UP FROM BOARD slightly so that the pixels fall off cleanly */
+        drive.updatePoseEstimate();
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .lineToX(46)
+                        .build());
+        drive.updatePoseEstimate();
+
+        /* Determine path to Floor Position */
+        RedRightPurplePixelDecision();
+
+        // Calculate the path from the floor Position to the Stack
+        // Build up the Floor to Stack Trajectory
+        if (control.autoPosition == 1)
+        {
+            DriveToStack = drive.actionBuilder(deliverToFloorPose)
+                    .splineToLinearHeading(new Pose2d(12,-56, Math.toRadians(180)), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,-56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .build();
+
+        }
+        else
+        {
+            DriveToStack = drive.actionBuilder(deliverToFloorPose)
+                    .strafeToLinearHeading(new Vector2d(12,-56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .build();
+        }
+
+        Actions.runBlocking(
+                new SequentialAction(
+                        new ParallelAction(
+                                FloorTraj,
+                                new SequentialAction(
+                                        resetArm(),
+                                        new SleepAction(.15),
+                                        slidesDown()
+                                )
+                        ),
+                        dropOnLine(),
+                        new ParallelAction(
+                                resetArm(),
+                                servoIntake(),
+                                DriveToStack)
+                )
+        );
+        drive.updatePoseEstimate();
+
+        control.StackCorrectionHL();
+        drive.updatePoseEstimate();
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .build()
+        );
+        drive.updatePoseEstimate();
+
+        //grab 2 more white pixels
+        control.AutoPickupRoutineDrive(2.0);
+        drive.updatePoseEstimate();
+
+        // Build up the Stack to Board Position 3 Trajectory
+        BoardTraj2 = drive.actionBuilder(drive.pose)
+                //.setTangent(0)
+                //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                //.setTangent(Math.toRadians(270))5
+                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
+                .strafeToLinearHeading(new Vector2d(-55.5, -62), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(47,-62), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(47,-40), Math.toRadians(180))
+                .build();
+        //drive to position 3
+        Actions.runBlocking(new SequentialAction(
+                        autoGrab1(),
+                        new SleepAction(.5),
+                        new ParallelAction(
+                                new SequentialAction(
+                                        autoGrab2(),
+                                        new SleepAction(.15),
+                                        servoOuttake()
+                                ),
+                                BoardTraj2,
+                                new SequentialAction(
+                                        halfwayTrigger1(),
+                                        new SleepAction(.15),
+                                        halfwayTrigger2(),
+                                        new SleepAction(.15),
+                                        halfwayTrigger3()
+                                )
+                        )
+                )
+        );
 
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150); //TODO can we remove this sleep, the earlier delivery doesn't have a sleep, does it need one?
+        sleep(150);
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
                 .lineToX(45, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(48, -14), Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(48, -56, Math.toRadians(90)), Math.toRadians(90))
                 .build();
         Actions.runBlocking(
                 new ParallelAction(
@@ -239,10 +212,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                         servoStop()
                 )
         );
-
         telemetry.update();
     }
-
     public void RedBoardDecision() {
         // Look for potential errors
         //***POSITION 1***
@@ -257,58 +228,51 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         else {
             deliverToBoardPose = new Pose2d(47,-36,Math.toRadians(180));
         }
-        BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180))
-                /* **** Curvy spline route without swipe **** */
-                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
-                /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
+        BoardTraj2 = drive.actionBuilder(startPose)
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 .build();
     }
-    public void RedLeftPurplePixelDecision() {
-        //***POSITION 1***
+    public void RedRightPurplePixelDecision() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-41, -20, Math.toRadians(45));
-            FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, -33, Math.toRadians(90)), Math.toRadians(90))
-                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(45))
+            deliverToFloorPose = new Pose2d(12, -33, Math.toRadians(0));
+            FloorTraj = drive.actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
+                    //.setTangent(Math.toRadians(180))
+                    .lineToX(0)
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
+                    //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
+                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
                     .build();
         }
-        //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(-36, -34.5, Math.toRadians(180));
-            FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, -35.5, Math.toRadians(90)), Math.toRadians(90))
-                    .strafeToLinearHeading(new Vector2d(-27, -35.5), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
+            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(180));
+            FloorTraj = drive.actionBuilder(deliverToBoardPose)
+                    .setTangent(Math.toRadians(180))
+                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
-        //***POSITION 2***
         else {
-            deliverToFloorPose = new Pose2d(-36, -12.5, Math.toRadians(90));
-            FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-46, -33, Math.toRadians(90)), Math.toRadians(90))
-                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
+            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(270));
+            FloorTraj = drive.actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(12, -30, Math.toRadians(-90)), Math.toRadians(180))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
                     .build();
         }
     }
-
-    public Action lockPixels(){return new LockPixels();}
+    public Action lockPixels(){return new RedBoardWORLDS.LockPixels();}
     public class LockPixels implements Action{
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 control.GrabPixels();
-                control.ReleaseLeft();
                 initialized = true;
             }
             packet.put("lock purple pixel", 0);
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action dropOnLine(){return new DropOnLine();}
+    public Action dropOnLine(){return new RedBoardWORLDS.DropOnLine();}
     public class DropOnLine implements Action{
         private boolean initialized = false;
         @Override
@@ -321,7 +285,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action resetArm(){return new ResetArm();}
+    public Action resetArm(){return new RedBoardWORLDS.ResetArm();}
     public class ResetArm implements Action{
         private boolean initialized = false;
         @Override
@@ -334,7 +298,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action slidesDown(){return new SlidesDown();}
+    public Action slidesDown(){return new RedBoardWORLDS.SlidesDown();}
     public class SlidesDown implements Action{
         private boolean initialized = false;
         @Override
@@ -347,7 +311,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab1(){return new AutoGrab1();}
+    public Action autoGrab1(){return new RedBoardWORLDS.AutoGrab1();}
     public class AutoGrab1 implements Action{
         private boolean initialized = false;
         @Override
@@ -360,7 +324,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab2(){return new AutoGrab2();}
+    public Action autoGrab2(){return new RedBoardWORLDS.AutoGrab2();}
     public class AutoGrab2 implements Action{
         private boolean initialized = false;
         @Override
@@ -373,7 +337,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoOuttake(){return new ServoOuttake();}
+    public Action servoOuttake(){return new RedBoardWORLDS.ServoOuttake();}
     public class ServoOuttake implements Action{
         private boolean initialized = false;
         @Override
@@ -386,7 +350,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoIntake(){return new ServoIntake();}
+    public Action servoIntake(){return new RedBoardWORLDS.ServoIntake();}
     public class ServoIntake implements Action{
         private boolean initialized = false;
         @Override
@@ -399,7 +363,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger1(){return new HalfwayTrigger1();}
+    public Action halfwayTrigger1(){return new RedBoardWORLDS.HalfwayTrigger1();}
     public class HalfwayTrigger1 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -412,7 +376,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger2(){return new HalfwayTrigger2();}
+    public Action halfwayTrigger2(){return new RedBoardWORLDS.HalfwayTrigger2();}
     public class HalfwayTrigger2 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -425,7 +389,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger3(){return new HalfwayTrigger3();}
+    public Action halfwayTrigger3(){return new RedBoardWORLDS.HalfwayTrigger3();}
     public class HalfwayTrigger3 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -438,7 +402,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoStop(){return new ServoStop();}
+    public Action servoStop(){return new RedBoardWORLDS.ServoStop();}
     public class ServoStop implements Action{
         private boolean initialized = false;
         @Override
@@ -449,7 +413,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             }
             packet.put("drop purple pixel on line", 0);
             return false;
-            }
+        }
     }
 }
 

@@ -36,9 +36,9 @@ public class MeepMeep_RedFarWORLDS {
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180));
 
         // Define some custom constraints to use when wanting to go faster than defaults
-        speedUpVelocityConstraint = new TranslationalVelConstraint(120.0);
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);
-        slowDownVelocityConstraint = new TranslationalVelConstraint(15);
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75);
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);
+        slowDownVelocityConstraint = new TranslationalVelConstraint(5);
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);
 
         // Define the standard constraints to use for this robot
@@ -223,10 +223,13 @@ public class MeepMeep_RedFarWORLDS {
         }
         BoardTraj2 = myBot.getDrive().actionBuilder(stackPose)
                 //.lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(24, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                //.splineToConstantHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
                 .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
                 .build();

@@ -1,8 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 import static org.firstinspires.ftc.teamcode.MecanumDrive.PARAMS;
 
-import com.acmerobotics.roadrunner.Pose2d;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -11,7 +9,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -19,7 +16,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -29,13 +25,11 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-import java.lang.reflect.Field;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 @Config
 public class  UniversalControlClass {
     LinearOpMode opMode;
-    //TODO: Create Motors, sensors, and servos
     DcMotor leftFront;
     DcMotor leftRear;
     DcMotor rightFront;
@@ -54,7 +48,7 @@ public class  UniversalControlClass {
     HuskyLens huskyLens;
     HuskyLens huskyLens2;
     IMU imu;
-    public double imu_offsetInDegrees;
+    public double imuOffsetInDegrees;
     Servo   grabberLeft;
     Servo   grabberRight;
     Servo armRotRight;
@@ -67,7 +61,6 @@ public class  UniversalControlClass {
     RevBlinkinLedDriver blinkinLedDriverLeft;
     RevBlinkinLedDriver blinkinLedDriverRight;
 
-    //TODO: set universal variables (public static to make available in dashboard
     boolean IsDriverControl;
     boolean IsFieldCentric;
     int hopperDistance = 30;
@@ -125,14 +118,12 @@ public class  UniversalControlClass {
     int blueRight = 0;
     public static boolean allianceColorIsBlue = false;
 
-    //TODO: Add any other specification variables
     public UniversalControlClass(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
         this.IsFieldCentric = isFieldCentric;
         this.opMode = opMode;
     }
     public void Init (HardwareMap hardwareMap) {
-        //TODO: hardware map all servos, motors, sensors, and cameras
         leftFront = hardwareMap.get(DcMotor.class, "leftFront_leftOdometry");
         leftRear = hardwareMap.get(DcMotor.class, "leftRear");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
@@ -169,7 +160,6 @@ public class  UniversalControlClass {
         huskyLens = hardwareMap.get(HuskyLens.class, "huskyLens1");
         huskyLens2 = hardwareMap.get(HuskyLens.class, "huskyLens2");
 
-        //TODO: set motor direction, zero power brake behavior, stop and reset encoders, etc
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
         armRotLeft.setDirection(Servo.Direction.FORWARD);  // Updated for Axon: To FORWARD
@@ -187,7 +177,8 @@ public class  UniversalControlClass {
         leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setDirection(DcMotor.Direction.FORWARD);
         leftSlide.setDirection(DcMotor.Direction.REVERSE);
-        intakeLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        intakeLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -280,7 +271,7 @@ public class  UniversalControlClass {
         // move the arm to just off of the floor -- candidate part to do in parallel
         armRotLeft.setPosition(.72);
         armRotRight.setPosition(.72);
-        SpecialSleep(200);
+        SpecialSleep(200);  //TODO -- Test if we can remove this sleep
 
         // move the wrist to put the purple pixel on the floor
         wristLeft.setPosition(.85);
@@ -289,14 +280,14 @@ public class  UniversalControlClass {
 
         // release the purple pixel
         grabberRight.setPosition(0);
-        SpecialSleep(100);
+        SpecialSleep(200); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
 
         // Move the arm and wrist slightly up so the grabber servo is clear of the pixel, so doesn't fly out when the arm is reset
         armRotLeft.setPosition(.7);
         armRotRight.setPosition(.7);
         wristLeft.setPosition(.83);
         wristRight.setPosition(.83);
-        SpecialSleep(200);
+        SpecialSleep(200); //TODO -- see how low we can make this sleep without flinging (was 200 at state)
     }
     public void SafeStow(){
         grabberLeft.setPosition(.72);
@@ -650,7 +641,6 @@ public class  UniversalControlClass {
         return slidesAllDown;
     }
     public void SetSlidePower(double power){
-        //TODO: CLAIRE slides w/ limit switch
         if ((leftSlideLimit.isPressed() && power < 0) || (rightSlideLimit.isPressed() && power < 0))
         {
             slidePower = 0;
@@ -679,6 +669,11 @@ public class  UniversalControlClass {
         opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
         showColorSensorTelemetry();
         opMode.telemetry.update();
+    }
+
+    public void ShowAutonomousData(){
+      opMode.telemetry.addData("imu Heading: ", GetIMU_HeadingInDegrees());
+      opMode.telemetry.update();
     }
 
     public void StopNearBoard(){
@@ -1191,7 +1186,7 @@ public class  UniversalControlClass {
 
     public double GetIMU_HeadingInDegrees()
     {
-        double botHeading = AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imu_offsetInDegrees);
+        double botHeading = AngleUnit.normalizeDegrees(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + imuOffsetInDegrees);
 
         return botHeading;
 
