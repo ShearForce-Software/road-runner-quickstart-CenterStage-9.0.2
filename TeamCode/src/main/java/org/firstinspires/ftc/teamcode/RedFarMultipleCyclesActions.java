@@ -44,8 +44,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
@@ -90,8 +90,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 )
         );
         drive.updatePoseEstimate();
-        double timeLeft = 30-getRuntime();  //TODO -- these two lines should be at the bottom of the routine not near the start
-        telemetry.addData("Time left", timeLeft);
+
         /* Pick up a White Pixel from the stack */
         control.AutoPickupRoutineDrive(1.5);
         drive.updatePoseEstimate();
@@ -149,8 +148,10 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 //.splineToLinearHeading(stackPose, Math.toRadians(180))
                 /* **** Pure strafe out trajectory **** */
                 .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 // Return to stack
-                .strafeToLinearHeading(new Vector2d(-54, stackY-1.5), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-54, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .build();
 
                 //TODO -- Test if this is more accurate
@@ -181,16 +182,18 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
 
         //grab 2 more white pixels
         control.AutoPickupRoutineDrive(2.0);
-        sleep(200);
+        //sleep(200);
         drive.updatePoseEstimate();
 
         //drive to position 1
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(47.5, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(47.5, -36), Math.toRadians(180))
                 .build();
 
@@ -220,7 +223,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150); //TODO can we remove this sleep, the earlier delivery doesn't have a sleep, does it need one?
+        //sleep(150);
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
@@ -240,6 +243,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 )
         );
 
+        double timeLeft = 30-getRuntime();
+        telemetry.addData("Time left", timeLeft);
         telemetry.update();
     }
 
@@ -247,19 +252,22 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         // Look for potential errors
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(47,-30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-30,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(47,-42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-42,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(47,-36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-36,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180))
+                //.lineToX(-56, slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
