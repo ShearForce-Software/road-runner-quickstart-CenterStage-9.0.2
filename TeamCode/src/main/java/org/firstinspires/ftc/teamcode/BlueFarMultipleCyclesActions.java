@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 //@Disabled
-@Autonomous(name="Blue Far Multiple Cycles Actions"/*, preselectTeleOp = "1 Manual Control"*/)
+@Autonomous(name="Blue Far Multiple Cycles Actions", preselectTeleOp = "1 Manual Control")
 public class BlueFarMultipleCyclesActions extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);
     MecanumDrive drive;
@@ -34,11 +34,11 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    int stackY = 12;
+    double stackY = 12.0;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
-        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(175)); //-54.5,-11.5
+        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
         speedUpVelocityConstraint = new TranslationalVelConstraint(75.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
         speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
@@ -61,6 +61,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
             BlueRightPurplePixelDecision();
         }
         resetRuntime();
+        control.autoTimeLeft = 0.0;
 
         // Create the floor to Stack trajectory
         DriveToStack = drive.actionBuilder(deliverToFloorPose)
@@ -133,13 +134,16 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                         .build());
         drive.updatePoseEstimate();
 
-        // *****************************
-        // ** ROADRUNNER RESET *********
-        // ** correct y and heading ****
-        // *****************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, deliverToBoardPose.position.y, Math.toRadians(control.GetIMU_HeadingInDegrees())));
-        control.ShowAutonomousData();
-        drive.updatePoseEstimate();
+        // if tag correction logic says we were more than 0.5 inches off of the expected location, then need to reset roadrunner
+        if ((control.distanceCorrectionLR_HL > 0.5) || (control.distanceCorrectionLR_HL < -0.5)) {
+            // *****************************
+            // ** ROADRUNNER RESET *********
+            // ** correct y and heading ****
+            // *****************************
+            drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, deliverToBoardPose.position.y, Math.toRadians(control.GetIMU_HeadingInDegrees())));
+            control.ShowAutonomousData();
+            drive.updatePoseEstimate();
+        }
 
         /* release pixels on the board using the distance sensor to know when to stop */
         control.StopNearBoardAuto(true);
@@ -192,13 +196,16 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         );
         drive.updatePoseEstimate();
 
-        // *****************************
-        // ** ROADRUNNER RESET *********
-        // ** correct y and heading ****
-        // *****************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, stackY, Math.toRadians( control.GetIMU_HeadingInDegrees())));
-        control.ShowAutonomousData();
-        drive.updatePoseEstimate();
+        // if husky lens correction logic says we were more than 0.5 inches off of the expected location, then need to reset roadrunner
+        if ((control.distanceCorrectionLR_HL > 0.5) || (control.distanceCorrectionLR_HL < -0.5)) {
+            // *****************************
+            // ** ROADRUNNER RESET *********
+            // ** correct y and heading ****
+            // *****************************
+            drive = new MecanumDrive(hardwareMap, new Pose2d(drive.pose.position.x, stackY, Math.toRadians(control.GetIMU_HeadingInDegrees())));
+            control.ShowAutonomousData();
+            drive.updatePoseEstimate();
+        }
 
 
         //grab 2 more white pixels
@@ -211,11 +218,11 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                 //                .lineToX(-56, slowDownVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(47.5, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(47.5, 26), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(46, 33), Math.toRadians(180))
                 .build();
 
         Actions.runBlocking(new SequentialAction(

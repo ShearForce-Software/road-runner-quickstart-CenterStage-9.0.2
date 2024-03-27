@@ -29,30 +29,31 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
     static AccelConstraint speedUpAccelerationConstraint;
     static VelConstraint slowDownVelocityConstraint;
     static AccelConstraint slowDownAccelerationConstraint;
+    static double stackY = 12.0;
 
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(500);
 
         startPose = new Pose2d(-36,62.5,Math.toRadians(-90));
-        stackPose = new Pose2d(-54.5, 13.5, Math.toRadians(180));
+        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180));
 
         // Define the standard constraints to use for this robot
         myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(40, 40, Math.PI*.8, Math.PI, 15)
+                .setConstraints(40, 40, Math.PI*.6, Math.PI*.8, 18.959)
                 .setDimensions(18, 15)
                 .build();
 
         // Define some custom constraints to use when wanting to go faster than defaults
-        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0);
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);
-        slowDownVelocityConstraint = new TranslationalVelConstraint(15); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0);
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);
+        slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 1;
+        autoPosition = 2;
 
         // Build up the floor delivery trajectory
         BlueLeftPurplePixelDecision();
@@ -74,27 +75,38 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
         // Build up the Board back to Stack Trajectory
         DriveBackToStack = myBot.getDrive().actionBuilder(new Pose2d(46, deliverToBoardPose.position.y, Math.toRadians(180)))
                 /* **** Curvy spline route out **** */
-                .splineToLinearHeading(new Pose2d(45, 12, Math.toRadians(180)), Math.toRadians(180))
+                //.splineToLinearHeading(new Pose2d(24, stackY, Math.toRadians(180)), Math.toRadians(180), speedUpVelocityConstraint)
+                .splineToConstantHeading(new Vector2d(24, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Pure strafe out trajectory **** */
-                //.strafeToLinearHeading(new Vector2d(45, 11.5), Math.toRadians(180))
+                //.strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
                 // Return to stack
-                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
-                //.lineToX(-60.5, slowDownVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(stackPose.position.x, stackY), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .build();
 
         // Build up the Stack to Board Position 3 Trajectory
         Action BoardTrajFinal = myBot.getDrive().actionBuilder(stackPose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, 12), Math.toRadians(180))
+                //                .lineToX(-56, slowDownVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(24, stackY), speedUpVelocityConstraint)
+                //.splineToConstantHeading(new Vector2d(46, 33), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
-                .splineToLinearHeading(new Pose2d(47.5, 22, Math.toRadians(180)), Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(46, 33, Math.toRadians(180)), Math.toRadians(0), speedUpVelocityConstraint)
                 /* **** Pure swipe-strafe in trajectory **** */
-                //.strafeToLinearHeading(new Vector2d(47.5, 24), Math.toRadians(180))
+                //.strafeToLinearHeading(new Vector2d(46, 33), Math.toRadians(180))
                 .build();
 
         // Build up the Board position 3 to Parking Trajectory
         //Action Park = myBot.getDrive().actionBuilder(new Pose2d(46, deliverToBoardPose.position.y, Math.toRadians(180)))
-        Action Park = myBot.getDrive().actionBuilder(new Pose2d(47.5, 24, Math.toRadians(180)))
+        Action Park = myBot.getDrive().actionBuilder(new Pose2d(46, 33, Math.toRadians(180)))
                 .lineToX(45, slowDownVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(48, 14), Math.toRadians(270))
                 .build();
@@ -103,24 +115,22 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
                 // Drive to Floor Position
                 FloorTraj,
                 // simulate waiting for purple pixel delivery & resetArm
-                new SleepAction(.02),
-                // simulate waiting for slides down
-                new SleepAction(0.02),
+                new SleepAction(.575),
                 DriveToStack,
-                // simulate waiting to get to the white pixel pickup location
-                new SleepAction(0.02),
+                // simulate waiting to detect two pixels ready to pickup
+                new SleepAction(.5),
                 // simulate waiting to pick up the pixels
-                new SleepAction(.05),
+                new SleepAction(.25),
                 BoardTraj2,
                 // simulate waiting for board delivery and april tag correction
-                new SleepAction(0.06),
+                new SleepAction(0.6),
                 Backup1,
                 // Drive back to the stack - part 1
                 DriveBackToStack,
-                // simulate waiting to get to the white pixel pickup location
-                new SleepAction(0.7),
+                // simulate waiting to detect two pixels ready to pickup
+                new SleepAction(.5),
                 // simulate waiting to pick up the pixels
-                new SleepAction(1.05),
+                new SleepAction(.25),
                 // Drive to Board Position 3
                 BoardTrajFinal,
                 // simulate waiting for board delivery
@@ -139,22 +149,22 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
     }
 
     static public void BlueLeftPurplePixelDecision() {
-        //***POSITION 3***
-        if (autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(-30, 21, Math.toRadians(315));
-            FloorTraj = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
-                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(315))
-                    //.splineToLinearHeading(deliverToFloorPose), Math.toRadians(315))
-                    .build();
-        }
         //***POSITION 1***
-        else if (autoPosition == 1) {
+        if (autoPosition == 1) {
             deliverToFloorPose = new Pose2d(-36, 33, Math.toRadians(180));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
                     .strafeToLinearHeading(new Vector2d(-27, 35.5), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
+                    .build();
+        }
+        //***POSITION 3***
+        else if (autoPosition == 3) {
+            deliverToFloorPose = new Pose2d(-37.5, 22.5, Math.toRadians(315));
+            FloorTraj = myBot.getDrive().actionBuilder(startPose)
+                    .splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
+                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(315))
+                    //.splineToLinearHeading(deliverToFloorPose), Math.toRadians(315))
                     .build();
         }
         //***POSITION 2***
@@ -171,21 +181,30 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
         // Look for potential errors
         //***POSITION 1***
         if (autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(47,42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,42,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(47,30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,30,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(47,36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,36,Math.toRadians(180));
         }
         BoardTraj2 = myBot.getDrive().actionBuilder(stackPose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(45.5, 12), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(24, stackY), speedUpVelocityConstraint)
+                //.splineToConstantHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180), speedUpVelocityConstraint)
+
+                // .lineToX(-56, slowDownVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
-                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0), speedUpVelocityConstraint)
                 /* **** Pure swipe-strafe in trajectory **** */
                 //.strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
                 .build();

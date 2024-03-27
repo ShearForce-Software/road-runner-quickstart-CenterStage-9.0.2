@@ -64,6 +64,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             RedLeftPurplePixelDecision();
         }
         resetRuntime();
+        control.autoTimeLeft = 0.0;
 
         // Create the floor to Stack trajectory
         DriveToStack = drive.actionBuilder(deliverToFloorPose)

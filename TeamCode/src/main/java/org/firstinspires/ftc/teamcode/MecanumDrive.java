@@ -87,6 +87,8 @@ public final class MecanumDrive {
         public double headingVelGain = 0.0; // shared with turn
     }
 
+    public static int useIMU_Heading = 0;
+    public static double imuOffsetRadians = 0.0;
     public static Params PARAMS = new Params();
 
     public final MecanumKinematics kinematics = new MecanumKinematics(
@@ -206,6 +208,7 @@ public final class MecanumDrive {
 
     public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
         this.pose = pose;
+        imuOffsetRadians = this.pose.heading.toDouble();
 
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
@@ -462,6 +465,10 @@ public final class MecanumDrive {
     public PoseVelocity2d updatePoseEstimate() {
         Twist2dDual<Time> twist = localizer.update();
         pose = pose.plus(twist.value());
+
+        if (useIMU_Heading != 0) {
+            pose = new Pose2d(pose.position.x, pose.position.y, AngleUnit.normalizeRadians(lazyImu.get().getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + imuOffsetRadians));
+        }
 
         poseHistory.add(pose);
         while (poseHistory.size() > 100) {

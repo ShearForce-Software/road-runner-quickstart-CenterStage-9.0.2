@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 //@Disabled
-@Autonomous(name="Blue Far WORLDS"/*, preselectTeleOp = "1 Manual Control"*/)
+@Autonomous(name="Blue Far WORLDS", preselectTeleOp = "1 Manual Control")
 public class BlueFarWORLDS extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);
     MecanumDrive drive;
@@ -60,6 +60,7 @@ public class BlueFarWORLDS extends LinearOpMode {
             BlueRightPurplePixelDecision();
         }
         resetRuntime();
+        control.autoTimeLeft = 0.0;
 
         // Create the floor to Stack trajectory
         DriveToStack = drive.actionBuilder(deliverToFloorPose)

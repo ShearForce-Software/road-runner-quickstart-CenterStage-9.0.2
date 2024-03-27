@@ -57,6 +57,7 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
             telemetry.update();
         }
         resetRuntime();
+        control.autoTimeLeft = 0.0;
 
         // ***************************************************
         // ****  START DRIVING    ****************************
