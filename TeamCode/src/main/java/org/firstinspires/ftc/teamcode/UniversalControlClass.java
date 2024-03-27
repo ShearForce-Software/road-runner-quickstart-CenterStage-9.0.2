@@ -144,7 +144,7 @@ public class  UniversalControlClass {
 
         leftScissor = hardwareMap.get(DcMotor.class, "centerOdometry");
         rightScissor = hardwareMap.get(DcMotor.class, "rightScissor");
-        leftScissor.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftScissor.setDirection(DcMotorSimple.Direction.FORWARD);
         leftScissor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightScissor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftScissor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
