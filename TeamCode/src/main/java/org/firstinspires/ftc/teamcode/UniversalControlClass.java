@@ -117,6 +117,7 @@ public class  UniversalControlClass {
     int greenRight = 0;
     int blueRight = 0;
     public static boolean allianceColorIsBlue = false;
+    public static double autoTimeLeft = 0.0;
 
     public UniversalControlClass(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
@@ -667,6 +668,7 @@ public class  UniversalControlClass {
         opMode.telemetry.addData("LeftScissor: ", leftScissor.getPower());
         opMode.telemetry.addData("RightScissor: ", rightScissor.getPower());
         opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
+        opMode.telemetry.addData("Auto Last Time Left: ", autoTimeLeft);
         showColorSensorTelemetry();
         opMode.telemetry.update();
     }

@@ -210,6 +210,8 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
                         servoStop()
                 )
         );
+        control.autoTimeLeft = 30-getRuntime();
+        telemetry.addData("Time left", control.autoTimeLeft);
         telemetry.update();
     }
     public void RedBoardDecision() {

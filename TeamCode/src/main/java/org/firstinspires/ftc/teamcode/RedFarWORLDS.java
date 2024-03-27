@@ -229,8 +229,8 @@ public class RedFarWORLDS extends LinearOpMode {
                 )
         );
 
-        double timeLeft = 30-getRuntime();
-        telemetry.addData("Time left", timeLeft);
+        control.autoTimeLeft = 30-getRuntime();
+        telemetry.addData("Time left", control.autoTimeLeft);
         telemetry.update();
     }
 
