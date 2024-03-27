@@ -93,7 +93,7 @@ public class RedFarWORLDS extends LinearOpMode {
         RedBoardDecision(); // updates BoardTraj2
         Actions.runBlocking(new SequentialAction(
                 autoGrab1(),
-                new SleepAction(.5),
+                new SleepAction(.25),
                 new ParallelAction(
                         new SequentialAction(
                                 autoGrab2(),
@@ -158,7 +158,6 @@ public class RedFarWORLDS extends LinearOpMode {
                         servoIntake()
                 )
         );
-        drive.useExtraCorrectionLogic = false;
 
 
         /* Use camera to make a minor adjustment to position if needed */
@@ -173,7 +172,7 @@ public class RedFarWORLDS extends LinearOpMode {
 
         //grab 2 more white pixels
         control.AutoPickupRoutineDrive(2.0);
-        sleep(200);
+        //sleep(200); //TODO why do we need this sleep?
         drive.updatePoseEstimate();
 
         //drive to position 1
@@ -188,7 +187,7 @@ public class RedFarWORLDS extends LinearOpMode {
 
         Actions.runBlocking(new SequentialAction(
                         autoGrab1(),
-                        new SleepAction(.5),
+                        new SleepAction(.25),
                         new ParallelAction(
                                 new SequentialAction(
                                         autoGrab2(),
@@ -210,7 +209,7 @@ public class RedFarWORLDS extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150);
+        //sleep(150);
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
@@ -229,6 +228,10 @@ public class RedFarWORLDS extends LinearOpMode {
                         servoStop()
                 )
         );
+
+        double timeLeft = 30-getRuntime();
+        telemetry.addData("Time left", timeLeft);
+        telemetry.update();
     }
 
     public void RedBoardDecision() {

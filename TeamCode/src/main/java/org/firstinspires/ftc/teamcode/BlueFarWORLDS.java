@@ -39,8 +39,8 @@ public class BlueFarWORLDS extends LinearOpMode {
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
@@ -52,6 +52,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
+        control.imuOffsetInDegrees = 270; // Math.toDegrees(startPose.heading.toDouble());
 
         while(!isStarted()){
             control.DetectTeamArtBlue();
@@ -89,7 +90,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         // *******************************************************************
         // ********** CREATE A NEW MECANUM DRIVE to correct HEADING DRIFT ****
         // *******************************************************************
-        drive = new MecanumDrive(hardwareMap, new Pose2d(-55.5, 12, Math.toRadians(180)));
+        //drive = new MecanumDrive(hardwareMap, new Pose2d(-55.5, 12, Math.toRadians(180)));
 
         /* Pick up a White Pixel from the stack */
         control.AutoPickupRoutineDrive(1.5);
@@ -99,7 +100,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         BlueBoardDecision(); // updates BoardTraj2
         Actions.runBlocking(new SequentialAction(
                 autoGrab1(),
-                new SleepAction(.5),
+                new SleepAction(.25),
                 new ParallelAction(
                         new SequentialAction(
                                 autoGrab2(),
@@ -147,9 +148,9 @@ public class BlueFarWORLDS extends LinearOpMode {
                 /* **** Pure strafe out trajectory **** */
                 .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
                 // Return to stack
-                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .build();
 
         drive.useExtraCorrectionLogic = true;
@@ -172,7 +173,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-58,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build()
         );
         drive.updatePoseEstimate();
@@ -180,25 +181,26 @@ public class BlueFarWORLDS extends LinearOpMode {
 
         //grab 2 more white pixels
         control.AutoPickupRoutineDrive(2.0);
-        sleep(200);
+        //sleep(200);
         drive.updatePoseEstimate();
 
         //drive to position 3
         BoardTraj2 = drive.actionBuilder(drive.pose)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 //.lineToX(-56, slowDownVelocityConstraint)
                 //.strafeToLinearHeading(new Vector2d(44, stackY), Math.toRadians(180))
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(45.5, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(45.5, 26), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(47.5, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(47.5, 26), Math.toRadians(180))
                 .build();
 
         Actions.runBlocking(new SequentialAction(
                         autoGrab1(),
-                        new SleepAction(.5),
+                        new SleepAction(.25),
                         new ParallelAction(
                                 new SequentialAction(
                                         autoGrab2(),
@@ -220,7 +222,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150);
+        //sleep(150);
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
@@ -239,6 +241,11 @@ public class BlueFarWORLDS extends LinearOpMode {
                         servoStop()
                 )
         );
+
+        double timeLeft = 30-getRuntime();
+        telemetry.addData("Time left", timeLeft);
+        telemetry.update();
+
     }
 
     public void BlueBoardDecision() {
@@ -256,10 +263,11 @@ public class BlueFarWORLDS extends LinearOpMode {
             deliverToBoardPose = new Pose2d(46,36,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180))
+                //.lineToX(-56, slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
