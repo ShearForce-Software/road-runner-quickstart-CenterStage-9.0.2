@@ -15,6 +15,9 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -270,25 +273,31 @@ public class  UniversalControlClass {
     }
     public void DropOnLine(){
         // move the arm to just off of the floor -- candidate part to do in parallel
-        armRotLeft.setPosition(.72);
-        armRotRight.setPosition(.72);
-        SpecialSleep(200);  //TODO -- Test if we can remove this sleep
+
+        ArmRotationsPurplePixelDelivery();
+        //armRotLeft.setPosition(.72);
+        //armRotRight.setPosition(.72);
+        //SpecialSleep(200);  //TODO -- Test if we can remove this sleep
 
         // move the wrist to put the purple pixel on the floor
-        wristLeft.setPosition(.85);
-        wristRight.setPosition(.85);
-        SpecialSleep(200);
+        WristRotationsPurplePixelDelivery();
+        //wristLeft.setPosition(.85);
+        //wristRight.setPosition(.85);
+        //SpecialSleep(200);
 
         // release the purple pixel
-        grabberRight.setPosition(0);
-        SpecialSleep(200); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
+        ReleasePurplePixel();
+        //grabberRight.setPosition(0);
+        //SpecialSleep(200); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
+
 
         // Move the arm and wrist slightly up so the grabber servo is clear of the pixel, so doesn't fly out when the arm is reset
-        armRotLeft.setPosition(.7);
-        armRotRight.setPosition(.7);
-        wristLeft.setPosition(.83);
-        wristRight.setPosition(.83);
-        SpecialSleep(200); //TODO -- see how low we can make this sleep without flinging (was 200 at state)
+       ClearanceAfterPurpleDelivery();
+       //armRotLeft.setPosition(.7);
+        //armRotRight.setPosition(.7);
+        //wristLeft.setPosition(.83);
+       // wristRight.setPosition(.83);
+       //SpecialSleep(200); //TODO -- see how low we can make this sleep without flinging (was 200 at state)
     }
     public void SafeStow(){
         grabberLeft.setPosition(.72);
@@ -320,6 +329,32 @@ public class  UniversalControlClass {
         wristRight.setPosition(WRIST_GRAB_PIXEL_POS-.02);
         //SpecialSleep(150);
     }
+    public void ArmRotationsPurplePixelDelivery()
+        {
+            armRotLeft.setPosition(.69);
+            armRotRight.setPosition(.69);
+            ///op
+            // SpecialSleep(150);  //TODO -- Test if we can remove this sleep
+        }
+        public void WristRotationsPurplePixelDelivery()
+        {
+            wristLeft.setPosition(.85);
+            wristRight.setPosition(.85);
+            SpecialSleep(275);
+        }
+        public void ReleasePurplePixel()
+        {
+            grabberRight.setPosition(0);
+            SpecialSleep(150); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
+        }
+        public void ClearanceAfterPurpleDelivery()
+        {
+            armRotLeft.setPosition(.7);
+            armRotRight.setPosition(.7);
+            wristLeft.setPosition(.83);
+            wristRight.setPosition(.83);
+            SpecialSleep(150); //TODO -- see how low we can make this sleep without flinging (was 200 at state)
+        }
 
     public void SlidesToAuto(){
         leftSlide.setTargetPosition(SLIDE_AUTO_HEIGHT);
@@ -1236,4 +1271,5 @@ public class  UniversalControlClass {
             }
         }
     }
+
 }
