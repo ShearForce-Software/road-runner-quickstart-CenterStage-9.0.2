@@ -716,8 +716,8 @@ public class  UniversalControlClass {
     public void StopNearBoard(){
         double timeout = opMode.getRuntime() + 3;
         while((clawDistanceSensor.getDistance(DistanceUnit.MM) > 78) && (opMode.getRuntime() < timeout)){
-            opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
-            opMode.telemetry.update();
+           // opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
+//opMode.telemetry.update();
             moveRobot(-.55,0.0,0);
             opMode.sleep(100);
             if(clawDistanceSensor.getDistance(DistanceUnit.MM) <= 78){
@@ -741,8 +741,8 @@ public class  UniversalControlClass {
         if (releaseBoth) ReleaseRight();
     }
     public void moveRobot(double x, double y, double yaw) {
-        opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
-        opMode.telemetry.update();
+       // opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
+      //  opMode.telemetry.update();
         // Calculate wheel powers.
         double leftFrontPower    =  x -y -yaw;
         double rightFrontPower   =  x +y +yaw;
@@ -767,8 +767,8 @@ public class  UniversalControlClass {
         leftRear.setPower(leftBackPower *.5);
         rightRear.setPower(rightBackPower *.5);
 
-        opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
-        opMode.telemetry.update();
+      //  opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
+      //  opMode.telemetry.update();
     }
     public void SetScissorLiftPower(double power){
         leftScissor.setPower(power);

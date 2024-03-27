@@ -24,8 +24,9 @@ public class LocalizationTest extends LinearOpMode {
             //MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,-62.5,Math.toRadians(90)));
             //drive.lazyImu.get().resetYaw();
             //imuOffset = 90.0;
-            MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,Math.toRadians(0)));
+            MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,62.5,Math.toRadians(270)));
             drive.lazyImu.get().resetYaw();
+            imuOffset = -90.0;
             //TODO set yaw to 90
 
 
