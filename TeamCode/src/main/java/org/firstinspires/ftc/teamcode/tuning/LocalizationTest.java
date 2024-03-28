@@ -15,19 +15,32 @@ import org.firstinspires.ftc.teamcode.TankDrive;
 
 public class LocalizationTest extends LinearOpMode {
     double imuOffset = .0;
+    Pose2d startPose;
     @Override
     public void runOpMode() throws InterruptedException {
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
-            //Red Far Start Position startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
-            //MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,-62.5,Math.toRadians(90)));
-            //drive.lazyImu.get().resetYaw();
-            //imuOffset = 90.0;
-            MecanumDrive drive = new MecanumDrive(hardwareMap, new Pose2d(-36,62.5,Math.toRadians(270)));
+
+            // ZERO - ZERO- ZERO Start Position
+            startPose = new Pose2d(0,0,Math.toRadians(0));
+
+            // BLUE FAR
+            //startPose = new Pose2d(-36,62.5,Math.toRadians(270));
+
+            // Red FAR
+            //startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
+
+            // Red BOARD
+            //startPose = new Pose2d(12,-62.5,Math.toRadians(90));
+
+            // BLUE BOARD
+            //startPose = new Pose2d(12, 62.5, Math.toRadians(270));
+
+
+            MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);
             drive.lazyImu.get().resetYaw();
-            imuOffset = -90.0;
-            //TODO set yaw to 90
+            imuOffset = Math.toDegrees(startPose.heading.toDouble());
 
 
             waitForStart();
