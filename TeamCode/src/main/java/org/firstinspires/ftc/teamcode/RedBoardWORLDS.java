@@ -35,7 +35,6 @@ public class RedBoardWORLDS extends LinearOpMode {
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
     int stackY = -36;
-
     public void runOpMode(){
         startPose = new Pose2d(12,-62.5,Math.toRadians(90));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
