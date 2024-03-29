@@ -279,15 +279,15 @@ public class  UniversalControlClass {
 
         // release the purple pixel
         ReleasePurplePixel();
-        SpecialSleep(125); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
+        SpecialSleep(150); //TODO -- need to assess if can reduce this now that we have faster servos (was 200 with slow servos)
 // test 150
         // Move the arm and wrist slightly up so the grabber servo is clear of the pixel, so doesn't fly out when the arm is reset
         ClearanceAfterPurpleDelivery();
        // SpecialSleep(150); //TODO -- see how low we can make this sleep without flinging (was 200 at state)
     }
     public void ArmRotationsPurplePixelDelivery() {
-        armRotLeft.setPosition(.7);
-        armRotRight.setPosition(.7);
+        armRotLeft.setPosition(.69);
+        armRotRight.setPosition(.69);
     }
     public void WristRotationsPurplePixelDelivery() {
         wristLeft.setPosition(.85);
