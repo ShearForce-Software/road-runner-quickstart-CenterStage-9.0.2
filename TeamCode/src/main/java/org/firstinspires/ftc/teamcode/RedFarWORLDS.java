@@ -397,7 +397,7 @@ public class RedFarWORLDS extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
             //drive.updatePoseEstimate();
-            if (drive.pose.position.x >= 12) {
+            if (drive.pose.position.x >= 1) {
                 moveArm = true;
                 control.SlidesToAuto();
             }
@@ -410,7 +410,7 @@ public class RedFarWORLDS extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
             //drive.updatePoseEstimate();
-            if (drive.pose.position.x >= 12) {
+            if (drive.pose.position.x >= 1) {
                 moveArm = true;
                 control.DeliverPixelToBoardPosPart1();
             }
@@ -423,7 +423,7 @@ public class RedFarWORLDS extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
             //drive.updatePoseEstimate();
-            if (drive.pose.position.x >= 12) {
+            if (drive.pose.position.x >= 1) {
                 moveArm = true;
                 control.DeliverPixelToBoardPosPart2();
             }
