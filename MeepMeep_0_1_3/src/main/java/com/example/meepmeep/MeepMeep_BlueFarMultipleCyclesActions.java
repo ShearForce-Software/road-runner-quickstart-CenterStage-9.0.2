@@ -195,7 +195,7 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
                 .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
-                .strafeToConstantHeading(new Vector2d(24, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
                 //.splineToConstantHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180), speedUpVelocityConstraint)
 
                 // .lineToX(-56, slowDownVelocityConstraint)
@@ -204,9 +204,10 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
                 //.strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 //.strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
-                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0), speedUpVelocityConstraint)
+                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0), speedUpVelocityConstraint)
+                //.splineToConstantHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180), speedUpVelocityConstraint)
                 /* **** Pure swipe-strafe in trajectory **** */
-                //.strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
                 .build();
     }
 
