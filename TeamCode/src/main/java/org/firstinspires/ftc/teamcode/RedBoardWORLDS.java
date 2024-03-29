@@ -130,7 +130,7 @@ public class RedBoardWORLDS extends LinearOpMode {
                         new ParallelAction(
                                 FloorTraj,
                                 new SequentialAction(
-                                        resetArm(),
+                                        resetArmPurple(),
                                         new SleepAction(.15),
                                         slidesDown()
                                 )
@@ -292,6 +292,19 @@ public class RedBoardWORLDS extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 control.ResetArmAuto();
+                initialized = true;
+            }
+            packet.put("ResetArm", 0);
+            return false;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action resetArmPurple(){return new RedBoardWORLDS.ResetArmPurple();}
+    public class ResetArmPurple implements Action{
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ResetArmBoard();
                 initialized = true;
             }
             packet.put("ResetArm", 0);

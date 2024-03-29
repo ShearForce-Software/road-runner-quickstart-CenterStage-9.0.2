@@ -103,16 +103,16 @@ public class BlueBoardWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
 
         /* Determine path to Floor Position */
-        RedRightPurplePixelDecision();
+        BlueBoardPurplePixelDecision();
 
         // Calculate the path from the floor Position to the Stack
         // Build up the Floor to Stack Trajectory
-        if (control.autoPosition == 1)
+        if (control.autoPosition == 3)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .splineToLinearHeading(new Pose2d(12,56, Math.toRadians(180)), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-36,56), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-55.5,56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(12,56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-55.5,56), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
                     .build();
 
@@ -131,7 +131,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
                         new ParallelAction(
                                 FloorTraj,
                                 new SequentialAction(
-                                        resetArm(),
+                                        resetArmPurple(),
                                         new SleepAction(.15),
                                         slidesDown()
                                 )
@@ -165,8 +165,8 @@ public class BlueBoardWORLDS extends LinearOpMode {
                 //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
                 //.setTangent(Math.toRadians(270))5
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(-55.5, 62), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,62), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-55.5, 56), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(47,56), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(47,40), Math.toRadians(180))
                 .build();
         //drive to position 3
@@ -233,7 +233,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
                 .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 .build();
     }
-    public void RedRightPurplePixelDecision() {
+    public void BlueBoardPurplePixelDecision() {
         if (control.autoPosition == 1) {
             deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
@@ -244,7 +244,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         else if (control.autoPosition == 3) {
             deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(27,33, Math.toRadians(0)), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(27, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
                     //.setTangent(Math.toRadians(180))
                     .lineToX(0)
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
@@ -293,6 +293,19 @@ public class BlueBoardWORLDS extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 control.ResetArmAuto();
+                initialized = true;
+            }
+            packet.put("ResetArm", 0);
+            return false;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action resetArmPurple(){return new BlueBoardWORLDS.ResetArmPurple();}
+    public class ResetArmPurple implements Action{
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ResetArmBoard();
                 initialized = true;
             }
             packet.put("ResetArm", 0);

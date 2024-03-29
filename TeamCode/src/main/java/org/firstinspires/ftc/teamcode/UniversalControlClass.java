@@ -267,6 +267,12 @@ public class  UniversalControlClass {
         wristLeft.setPosition(.95);
         wristRight.setPosition(.95);
     }
+    public void ResetArmBoard(){
+        armRotLeft.setPosition(.16);
+        armRotRight.setPosition(.16);
+        wristLeft.setPosition(.95);
+        wristRight.setPosition(.95);
+    }
     public void GrabPixels(){
         grabberRight.setPosition(.72);
         grabberLeft.setPosition(.72);

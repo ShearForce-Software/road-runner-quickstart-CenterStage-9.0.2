@@ -51,7 +51,7 @@ public class MeepMeep_BlueBoardAutoMultipleCyclesActions {
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 2;
+        autoPosition = 3;
 
         // Build up the start to board delivery trajectory
         BlueBoardDecision();
