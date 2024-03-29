@@ -181,7 +181,7 @@ public class BlueFarWORLDS extends LinearOpMode {
 
 
         //grab 2 more white pixels
-        control.AutoPickupRoutineDrive(2.0);
+        control.AutoPickupRoutineDrive(2.2);
         //sleep(200);
         drive.updatePoseEstimate();
 
