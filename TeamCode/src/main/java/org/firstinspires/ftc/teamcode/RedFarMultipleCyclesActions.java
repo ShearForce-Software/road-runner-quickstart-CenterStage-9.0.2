@@ -82,7 +82,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                                 lockPixels(),
                                 FloorTraj),
                         /* Deliver the Purple Pixel */
-                        dropOnLine(), //TODO -- takes too long, need to see if can split up and make parts of it parallel
+                        // Used to be DropOnLine action
+                        new SequentialAction(
+                                prepareToDropPurplePixel(),
+                                new SleepAction(.275),
+                                releasePurplePixel(),
+                                new SleepAction(.125),
+                                clearanceAfterPurpleDelivery()
+                        ), //TODO -- takes too long, need to see if can split up and make parts of it parallel
                         /* Drive to the stack of white pixels */
                         new ParallelAction(
                                 resetArm(),
@@ -323,7 +330,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.DropOnLine(); //TODO split up this logic, it has a bunch of sleeps in it, should do some of this in parallel with driving
+                //control.DropOnLine(); //TODO split up this logic, it has a bunch of sleeps in it, should do some of this in parallel with driving
+                control.DropOnLine();
                 initialized = true;
             }
             packet.put("drop purple pixel on line", 0);
@@ -459,6 +467,48 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             packet.put("drop purple pixel on line", 0);
             return false;
             }
+    }
+    public Action prepareToDropPurplePixel(){return new PrepareToDropPurplePixel();}
+    public class PrepareToDropPurplePixel implements Action {
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ArmRotationsPurplePixelDelivery();
+                control.WristRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("prepare to drop purple pixel on line", 0);
+            return false;
+        }
+    }
+    public Action releasePurplePixel(){ return new ReleasePurplePixel();}
+    public class ReleasePurplePixel implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ReleasePurplePixel();
+                initialized = true;
+            }
+            packet.put("Release purple pixel on line", 0);
+            return false;
+        }
+    }
+    public Action clearanceAfterPurpleDelivery(){ return new ClearanceAfterPurpleDelivery();}
+    public class ClearanceAfterPurpleDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ClearanceAfterPurpleDelivery();
+                initialized = true;
+            }
+            packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
+            return false;
+        }
     }
 }
 

@@ -87,7 +87,7 @@ public final class MecanumDrive {
         public double headingVelGain = 0.0; // shared with turn
     }
 
-    public static int useIMU_Heading = 0;
+    public static int useIMU_Heading = 1;
     public static double imuOffsetRadians = 0.0;
     public static Params PARAMS = new Params();
 
