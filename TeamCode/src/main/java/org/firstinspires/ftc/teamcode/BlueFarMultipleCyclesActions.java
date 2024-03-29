@@ -212,7 +212,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
 
 
         //grab 2 more white pixels
-        control.AutoPickupRoutineDrive(2.0);
+        control.AutoPickupRoutineDrive(2.2);
         //sleep(200);
         drive.updatePoseEstimate();
 
@@ -232,7 +232,7 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
                 //.strafeToLinearHeading(new Vector2d(46, 33), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, 39), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, 33), Math.toRadians(180))
                 .build();
 
         Actions.runBlocking(new SequentialAction(

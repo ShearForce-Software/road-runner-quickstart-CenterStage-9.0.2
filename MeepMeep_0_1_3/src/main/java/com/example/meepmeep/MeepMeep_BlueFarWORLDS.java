@@ -47,8 +47,8 @@ public class MeepMeep_BlueFarWORLDS {
         // Define some custom constraints to use when wanting to go faster than defaults
         speedUpVelocityConstraint = new TranslationalVelConstraint(90.0);
         speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);
-        slowDownVelocityConstraint = new TranslationalVelConstraint(15); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        slowDownVelocityConstraint = new TranslationalVelConstraint(15);
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);
 
         // ******************************************
         /* Specify which Position will be run */
