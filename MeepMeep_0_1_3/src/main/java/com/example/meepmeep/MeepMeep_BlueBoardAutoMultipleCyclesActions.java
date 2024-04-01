@@ -44,14 +44,14 @@ public class MeepMeep_BlueBoardAutoMultipleCyclesActions {
         // Define the standard constraints to use for this robot
         myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(40, 40, Math.PI * .8, Math.PI, 15)
+                .setConstraints(40, 40, Math.PI*.6, Math.PI*.8, 18.959)
                 .setDimensions(18, 15)
                 .build();
 
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 3;
+        autoPosition = 2;
 
         // Build up the start to board delivery trajectory
         BlueBoardDecision();
@@ -60,11 +60,12 @@ public class MeepMeep_BlueBoardAutoMultipleCyclesActions {
         BlueRightPurplePixelDecision();
 
         // Build up the Floor to Stack Trajectory
-        if (autoPosition == 1)
+        if (autoPosition == 3)
         {
             DriveToStack = myBot.getDrive().actionBuilder(deliverToFloorPose)
-                    .splineToLinearHeading(new Pose2d(12,62, Math.toRadians(180)), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,62), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-55.5,56), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
                     .build();
 
@@ -72,8 +73,8 @@ public class MeepMeep_BlueBoardAutoMultipleCyclesActions {
         else
         {
             DriveToStack = myBot.getDrive().actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,62), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,62), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-55.5,56), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
                     .build();
         }
@@ -89,8 +90,8 @@ public class MeepMeep_BlueBoardAutoMultipleCyclesActions {
                 //.splineToLinearHeading(new Pose2d(47.5, 11.5, Math.toRadians(180)), Math.toRadians(0))
                 //.setTangent(Math.toRadians(270))5
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(-55.5, 62), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,62), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-55.5, 56), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(47,56), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(47,40), Math.toRadians(180))
                 .build();
 
@@ -132,54 +133,54 @@ public class MeepMeep_BlueBoardAutoMultipleCyclesActions {
                 .start();
     }
 
-        static public void BlueRightPurplePixelDecision() {
-            //***POSITION 1***
-            if (autoPosition == 1) {
-                deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(0));
-                FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                        .splineToLinearHeading(new Pose2d(27,33, Math.toRadians(0)), Math.toRadians(180))
-                        //.setTangent(Math.toRadians(180))
-                        .lineToX(0)
-                        .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
-                        //.splineToLinearHeading(new Pose2d(0,33, Math.toRadians(0)), Math.toRadians(0))
-                        //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
-                        .build();
-            }
-            //***POSITION 3***
-            else if (autoPosition == 3) {
-                deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(180));
-                FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                        .setTangent(Math.toRadians(180))
-                        .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
-                        .build();
-            }
-            //***POSITION 2***
-            else {
-                deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(270));
-                FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                        .splineToLinearHeading(new Pose2d(12, 30, Math.toRadians(-90)), Math.toRadians(180))
-                        .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
-                        .build();
-            }
+    static public void BlueBoardDecision() {
+        // Look for potential errors
+        //***POSITION 1***
+        if (autoPosition == 1) {
+            deliverToBoardPose = new Pose2d(47,42,Math.toRadians(180));
         }
-
-        static public void BlueBoardDecision() {
-            // Look for potential errors
-            //***POSITION 1***
-            if (autoPosition == 1) {
-                deliverToBoardPose = new Pose2d(47,42,Math.toRadians(180));
-            }
-            //***POSITION 3***
-            else if (autoPosition == 3) {
-                deliverToBoardPose = new Pose2d(47,30,Math.toRadians(180));
-            }
-            //***POSITION 2***
-            else {
-                deliverToBoardPose = new Pose2d(47,36,Math.toRadians(180));
-            }
-            BoardTraj2 = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+        //***POSITION 3***
+        else if (autoPosition == 3) {
+            deliverToBoardPose = new Pose2d(47,30,Math.toRadians(180));
+        }
+        //***POSITION 2***
+        else {
+            deliverToBoardPose = new Pose2d(47,36,Math.toRadians(180));
+        }
+        BoardTraj2 = myBot.getDrive().actionBuilder(startPose)
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                .build();
+    }
+    static public void BlueRightPurplePixelDecision() {
+        //***POSITION 1***
+        if (autoPosition == 1) {
+            deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(180));
+            FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
+                    .setTangent(Math.toRadians(180))
+                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
+        //***POSITION 3***
+        else if (autoPosition == 3) {
+            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(0));
+            FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(27, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
+                    //.setTangent(Math.toRadians(180))
+                    .lineToX(0)
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
+                    //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
+                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
+                    .build();
+        }
+        //***POSITION 2***
+        else {
+            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(90));
+            FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(12, 30, Math.toRadians(90)), Math.toRadians(180))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
+                    .build();
+        }
+    }
+
     }
 
