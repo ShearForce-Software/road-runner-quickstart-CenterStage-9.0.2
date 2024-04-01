@@ -163,8 +163,9 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
         drive.updatePoseEstimate();
 
         // Build up the Stack to Board Position 3 Trajectory
-        if (autoPosition == 1) {
-        BoardTraj2 = drive.actionBuilder(drive.pose)
+        // if position 1 then need to do extra care to avoid hitting alliance purple pixel
+        if (control.autoPosition == 1) {
+            BoardTraj2 = drive.actionBuilder(drive.pose)
                     //.setTangent(0)
                     //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
                     //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
@@ -177,9 +178,8 @@ public class RedBoardAutoMultipleCyclesActions extends LinearOpMode {
                     .strafeToLinearHeading(new Vector2d(30, -56), Math.toRadians(180), speedUpVelocityConstraint)
                     //.strafeToLinearHeading(new Vector2d(47,-40), Math.toRadians(180), speedUpVelocityConstraint)
                     .splineToLinearHeading(new Pose2d(47, -40, Math.toRadians(180)), Math.toRadians(0))
-                .build();
+                    .build();
 	    }
-		        }
         else {
             BoardTraj2 = drive.actionBuilder(drive.pose)
                     //.setTangent(0)
