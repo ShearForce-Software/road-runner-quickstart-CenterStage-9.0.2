@@ -235,14 +235,14 @@ public class BlueBoardWORLDS extends LinearOpMode {
     }
     public void BlueBoardPurplePixelDecision() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(0));
+            deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
                     .setTangent(Math.toRadians(180))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
                     .splineToLinearHeading(new Pose2d(27, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
                     //.setTangent(Math.toRadians(180))

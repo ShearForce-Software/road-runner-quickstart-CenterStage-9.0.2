@@ -34,7 +34,7 @@ public class RedBoardWORLDS extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    int stackY = -36;
+    double stackY = -36.0;
     public void runOpMode(){
         startPose = new Pose2d(12,-62.5,Math.toRadians(90));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
@@ -112,7 +112,7 @@ public class RedBoardWORLDS extends LinearOpMode {
                     .splineToLinearHeading(new Pose2d(12,-56, Math.toRadians(180)), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(-36,-56), Math.toRadians(180), speedUpVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                     .build();
 
         }
@@ -121,7 +121,7 @@ public class RedBoardWORLDS extends LinearOpMode {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
                     .strafeToLinearHeading(new Vector2d(12,-56), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                     .build();
         }
 

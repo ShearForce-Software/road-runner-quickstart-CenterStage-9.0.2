@@ -38,7 +38,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    int stackY = -12;
+    double stackY = -12.0;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
@@ -57,6 +57,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
+        control.imuOffsetInDegrees = 90; // Math.toDegrees(startPose.heading.toDouble());
 
         while(!isStarted()){
             control.DetectTeamArtRed();
@@ -68,7 +69,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
 
         // Create the floor to Stack trajectory
         DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                .splineToLinearHeading(stackPose, Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                 .lineToX(-57, slowDownVelocityConstraint)
                 .build();
 
@@ -89,7 +91,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                                 releasePurplePixel(),
                                 new SleepAction(.125),
                                 clearanceAfterPurpleDelivery()
-                        ), //TODO -- takes too long, need to see if can split up and make parts of it parallel
+                        ),
                         /* Drive to the stack of white pixels */
                         new ParallelAction(
                                 resetArm(),
@@ -151,18 +153,17 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         drive.updatePoseEstimate();
         DriveBackToStack = drive.actionBuilder(drive.pose)
                 /* **** Curvy spline route out **** */
-                //TODO -- Test if this is more accurate
                 //.splineToLinearHeading(new Pose2d(45, stackY, Math.toRadians(180)), Math.toRadians(180))
                 //.splineToLinearHeading(stackPose, Math.toRadians(180))
                 /* **** Pure strafe out trajectory **** */
-                .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(30, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 // Return to stack
-                .strafeToLinearHeading(new Vector2d(-54, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-52, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                 .build();
 
-                //TODO -- Test if this is more accurate
                 //drive.useExtraCorrectionLogic = true;
         Actions.runBlocking(
                 new ParallelAction(
@@ -175,7 +176,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                         servoIntake()
                 )
         );
-        drive.useExtraCorrectionLogic = false;
+        //drive.useExtraCorrectionLogic = false;
 
 
         /* Use camera to make a minor adjustment to position if needed */
@@ -189,20 +190,20 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         drive.updatePoseEstimate();
 
         //grab 2 more white pixels
-        control.AutoPickupRoutineDrive(2.0);
+        control.AutoPickupRoutineDrive(2.2);
         //sleep(200);
         drive.updatePoseEstimate();
 
         //drive to position 1
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(ew Pose2d(47.5, 22, Math.toRadians(180), Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
-                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(47.5, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(47.5, -36), Math.toRadians(180))
+                .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, -33), Math.toRadians(180))
                 .build();
 
         Actions.runBlocking(new SequentialAction(
@@ -272,10 +273,10 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 //.lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(46, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
                 /* **** Curvy spline route without swipe **** */
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
                 /* **** Pure swipe-strafe in trajectory **** */
@@ -330,7 +331,6 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                //control.DropOnLine(); //TODO split up this logic, it has a bunch of sleeps in it, should do some of this in parallel with driving
                 control.DropOnLine();
                 initialized = true;
             }

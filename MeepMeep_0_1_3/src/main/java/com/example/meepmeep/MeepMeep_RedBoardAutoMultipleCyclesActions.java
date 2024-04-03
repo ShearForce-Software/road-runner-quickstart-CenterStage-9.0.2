@@ -29,29 +29,29 @@ public class MeepMeep_RedBoardAutoMultipleCyclesActions {
     static VelConstraint slowDownVelocityConstraint;
     static AccelConstraint slowDownAccelerationConstraint;
 
+    static double stackY = -36.0;
     public static void main(String[] args) {
         MeepMeep meepMeep = new MeepMeep(500);
 
         startPose = new Pose2d(12, -62.5, Math.toRadians(90));
-        stackPose = new Pose2d(-55.5, -36, Math.toRadians(180));
+        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180));
 
-        // Define some custom constraints to use when wanting to go faster than defaults
-        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0);
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);
-        slowDownVelocityConstraint = new TranslationalVelConstraint(15);
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);
+        speedUpVelocityConstraint = new TranslationalVelConstraint(90.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-70.0, 70.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
         // Define the standard constraints to use for this robot
         myBot = new DefaultBotBuilder(meepMeep)
                 // Set bot constraints: maxVel, maxAccel, maxAngVel, maxAngAccel, track width
-                .setConstraints(40, 40, Math.PI * .8, Math.PI, 15)
+                .setConstraints(40, 40, Math.PI*.6, Math.PI*.8, 18.959)
                 .setDimensions(18, 15)
                 .build();
 
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 1;
+        autoPosition = 3;
 
         // Build up the start to board delivery trajectory
         RedBoardDecision();
@@ -60,21 +60,29 @@ public class MeepMeep_RedBoardAutoMultipleCyclesActions {
         RedRightPurplePixelDecision();
 
         // Build up the Floor to Stack Trajectory
+        // if autoPosition = 1, then need to take extra care to avoid hitting alliance purple pixel
+        //    and have to spline out from dropping our pixel instead of just strafing
         if (autoPosition == 1)
         {
             DriveToStack = myBot.getDrive().actionBuilder(deliverToFloorPose)
-                    .splineToLinearHeading(new Pose2d(12,-62, Math.toRadians(180)), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,-62), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(12,-56, Math.toRadians(180)), Math.toRadians(180))
+                    .strafeToConstantHeading(new Vector2d(-40, -56), speedUpVelocityConstraint)
+                    .strafeToConstantHeading(new Vector2d(-54, -56), speedUpVelocityConstraint)
+                    .strafeToConstantHeading(new Vector2d(-54, stackY), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                     .build();
 
         }
         else
         {
             DriveToStack = myBot.getDrive().actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,-62), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,-62), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,-56), Math.toRadians(180))
+                    .strafeToConstantHeading(new Vector2d(-36, -56), speedUpVelocityConstraint)
+                    //.strafeToConstantHeading(new Vector2d(-54, -56), speedUpVelocityConstraint)
+                    //.strafeToConstantHeading(new Vector2d(-54, stackY), speedUpVelocityConstraint)
+                    //.splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180), speedUpVelocityConstraint)
+                    .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                     .build();
         }
         /////
@@ -82,24 +90,48 @@ public class MeepMeep_RedBoardAutoMultipleCyclesActions {
         //        .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180), speedUpVelocityConstraint)
          //       .build();
 
+        Action BoardTrajFinal;
         // Build up the Stack to Board Position 3 Trajectory
-        Action BoardTrajFinal = myBot.getDrive().actionBuilder(stackPose)
-                //.setTangent(0)
-                //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
-                //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
-                //.setTangent(Math.toRadians(270))5
-                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(-55.5, -62), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,-62), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,-40), Math.toRadians(180))
-                .build();
-
+        // if position 1 then need to do extra care to avoid hitting alliance purple pixel
+        if (autoPosition == 1) {
+            BoardTrajFinal = myBot.getDrive().actionBuilder(stackPose)
+                    //.setTangent(0)
+                    //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                    //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                    //.setTangent(Math.toRadians(270))5
+                    //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
+                    .strafeToConstantHeading(new Vector2d(-54, stackY))
+                    .strafeToLinearHeading(new Vector2d(-54, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-40, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(12, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(30, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    //.strafeToLinearHeading(new Vector2d(47,-40), Math.toRadians(180), speedUpVelocityConstraint)
+                    .splineToLinearHeading(new Pose2d(47, -40, Math.toRadians(180)), Math.toRadians(0))
+                    .build();
+        }
+        else {
+            BoardTrajFinal = myBot.getDrive().actionBuilder(stackPose)
+                    //.setTangent(0)
+                    //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                    //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                    //.setTangent(Math.toRadians(270))5
+                    //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
+                    .strafeToConstantHeading(new Vector2d(-54, stackY))
+                    .splineToLinearHeading(new Pose2d(-36, -56, Math.toRadians(180)), Math.toRadians(0))
+//                    .strafeToLinearHeading(new Vector2d(-54, -56), Math.toRadians(180), speedUpVelocityConstraint)
+//                    .strafeToLinearHeading(new Vector2d(-40, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(12, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(30, -56), Math.toRadians(180), speedUpVelocityConstraint)
+                    //.strafeToLinearHeading(new Vector2d(47,-40), Math.toRadians(180), speedUpVelocityConstraint)
+                    .splineToLinearHeading(new Pose2d(47, -40, Math.toRadians(180)), Math.toRadians(0))
+                    .build();
+        }
         // Build up the Board position 3 to Parking Trajectory
         //Action Park = myBot.getDrive().actionBuilder(new Pose2d(46, deliverToBoardPose.position.y, Math.toRadians(180)))
         Action Park = myBot.getDrive().actionBuilder(new Pose2d(47, -40, Math.toRadians(180)))
-                .splineToLinearHeading(new Pose2d(48, -60, Math.toRadians(90)), Math.toRadians(90))
-                //.strafeToLinearHeading(new Vector2d(48, -10), Math.toRadians(90))
-                //.turnTo(Math.toRadians(90))
+                .lineToX(45, slowDownVelocityConstraint)
+                //.splineToLinearHeading(new Pose2d(48, -56, Math.toRadians(90)), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(48, -56), Math.toRadians(90))
                 .build();
 
         myBot.runAction(new SequentialAction(
@@ -132,56 +164,56 @@ public class MeepMeep_RedBoardAutoMultipleCyclesActions {
                 .start();
     }
 
-        static public void RedRightPurplePixelDecision() {
-            //***POSITION 1***
-            if (autoPosition == 1) {
-                deliverToFloorPose = new Pose2d(12, -33, Math.toRadians(0));
-                FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                        .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
-                        //.setTangent(Math.toRadians(180))
-                        .lineToX(0)
-                        .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
-                        //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
-                        //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
-                        .build();
-            }
-            //***POSITION 3***
-            else if (autoPosition == 3) {
-                deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(180));
-                FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                        .setTangent(Math.toRadians(180))
-                        .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
-                        .build();
-            }
-            //***POSITION 2***
-            else {
-                deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(270));
-                FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                        .splineToLinearHeading(new Pose2d(12, -30, Math.toRadians(-90)), Math.toRadians(180))
-                        .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
-                        .build();
-            }
-        }
 
-        static public void RedBoardDecision() {
-            // Look for potential errors
-            //***POSITION 1***
-            if (autoPosition == 1) {
-                deliverToBoardPose = new Pose2d(47,-30,Math.toRadians(180));
-            }
-            //***POSITION 3***
-            else if (autoPosition == 3) {
-                deliverToBoardPose = new Pose2d(47,-42,Math.toRadians(180));
-            }
-            //***POSITION 2***
-            else {
-                deliverToBoardPose = new Pose2d(47,-36,Math.toRadians(180));
-            }
-            BoardTraj2 = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+    static public void RedBoardDecision() {
+        // Look for potential errors
+        //***POSITION 1***
+        if (autoPosition == 1) {
+            deliverToBoardPose = new Pose2d(47,-30,Math.toRadians(180));
+        }
+        //***POSITION 3***
+        else if (autoPosition == 3) {
+            deliverToBoardPose = new Pose2d(47,-42,Math.toRadians(180));
+        }
+        //***POSITION 2***
+        else {
+            deliverToBoardPose = new Pose2d(47,-36,Math.toRadians(180));
+        }
+        BoardTraj2 = myBot.getDrive().actionBuilder(startPose)
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                .build();
+    }
+
+    static public void RedRightPurplePixelDecision() {
+        //***POSITION 1***
+        if (autoPosition == 1) {
+            deliverToFloorPose = new Pose2d(12, -33, Math.toRadians(0));
+            FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
+                    //.setTangent(Math.toRadians(180))
+                    .lineToX(0)
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
+                    //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
+                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
                     .build();
         }
-
+        //***POSITION 3***
+        else if (autoPosition == 3) {
+            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(180));
+            FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
+                    .setTangent(Math.toRadians(180))
+                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
+                    .build();
+        }
+        //***POSITION 2***
+        else {
+            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(270));
+            FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(12, -30, Math.toRadians(-90)), Math.toRadians(180))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
+                    .build();
+        }
+    }
 
     }
 
