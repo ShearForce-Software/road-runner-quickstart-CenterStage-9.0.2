@@ -74,7 +74,19 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                         /* Drive to Floor Position */
                         new ParallelAction(
                                 lockPixels(),
-                                FloorTraj),
+                                FloorTraj,
+                                new SequentialAction(
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275)
+                                )
+                        ),
+                        new SequentialAction(
+                                releasePurplePixel(),
+                                new SleepAction(.15),
+                                clearanceAfterPurpleDelivery()
+                        ),
                         /* Deliver the Purple Pixel */
                         dropOnLine(), //TODO -- takes too long, need to see if can split up and make parts of it parallel
                         new ParallelAction(
@@ -475,8 +487,9 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         }
     }
     public Action servoStop(){return new ServoStop();}
-    public class ServoStop implements Action{
+    public class ServoStop implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -485,7 +498,77 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
             }
             packet.put("drop purple pixel on line", 0);
             return false;
-            }
+        }
     }
+        public Action armRotationsPurplePixelDelivery() {
+            return new ArmRotationsPurplePixelDelivery();
+        }
+
+        public class ArmRotationsPurplePixelDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ArmRotationsPurplePixelDelivery();
+                    initialized = true;
+                }
+                packet.put("Rotate Arm to deliver purple pixel on line", 0);
+                return false;
+            }
+        }
+        public Action wristRotationsPurplePixelDelivery() {
+            return new WristRotationsPurplePixelDelivery();
+        }
+
+        public class WristRotationsPurplePixelDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.WristRotationsPurplePixelDelivery();
+                    initialized = true;
+                }
+                packet.put("Adjust wrist to deliver the purple pixel on line", 0);
+                return false;
+            }
+        }
+        public Action releasePurplePixel() {
+            return new ReleasePurplePixel();
+        }
+
+        public class ReleasePurplePixel implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ReleasePurplePixel();
+                    initialized = true;
+                }
+                packet.put("Release purple pixel on line", 0);
+                return false;
+            }
+        }
+
+        public Action clearanceAfterPurpleDelivery() {
+            return new ClearanceAfterPurpleDelivery();
+        }
+
+        public class ClearanceAfterPurpleDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ClearanceAfterPurpleDelivery();
+                    initialized = true;
+                }
+                packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
+                return false;
+            }
+        }
+
 }
 

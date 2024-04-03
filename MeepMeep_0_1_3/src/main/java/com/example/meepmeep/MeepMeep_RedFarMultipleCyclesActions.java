@@ -222,8 +222,8 @@ public class MeepMeep_RedFarMultipleCyclesActions {
         else if (autoPosition == 3) {
             deliverToFloorPose = new Pose2d(-36, -34.5, Math.toRadians(180));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, -34.5, Math.toRadians(180)), Math.toRadians(90))
-                    .strafeToLinearHeading(new Vector2d(-27, -34.5), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(-42, -34.5, Math.toRadians(180)), Math.toRadians(90))
+                    .strafeToLinearHeading(new Vector2d(-35, -34.5), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
                     .build();
         }
