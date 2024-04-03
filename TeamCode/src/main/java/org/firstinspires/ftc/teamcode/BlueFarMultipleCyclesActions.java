@@ -30,20 +30,15 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
     Action BoardTraj2;
     Action Park;
     Action DriveBackToStack;
-    VelConstraint speedUpVelocityConstraint;
-    AccelConstraint speedUpAccelerationConstraint;
-    VelConstraint slowDownVelocityConstraint;
-    AccelConstraint slowDownAccelerationConstraint;
+    public static VelConstraint speedUpVelocityConstraint = new TranslationalVelConstraint(70.0);
+    public static AccelConstraint speedUpAccelerationConstraint= new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+    public static VelConstraint slowDownVelocityConstraint= new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
+    public static AccelConstraint slowDownAccelerationConstraint= new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
     double stackY = 12.0;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
-
-        speedUpVelocityConstraint = new TranslationalVelConstraint(70.0);
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
-        slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
         /* Initialize the Robot */
         drive = new MecanumDrive(hardwareMap, startPose);

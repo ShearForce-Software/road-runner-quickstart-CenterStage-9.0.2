@@ -34,16 +34,17 @@ public class BlueBoardWORLDS extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    int stackY = 36;
+    double stackY = 36;
+    double stackX = -58;
 
     public void runOpMode(){
         startPose = new Pose2d(12,62.5,Math.toRadians(270));
-        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
+        stackPose = new Pose2d(stackX, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(75); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
+        speedUpVelocityConstraint = new TranslationalVelConstraint(70); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
         speedUpAccelerationConstraint = new ProfileAccelConstraint(-75, 75);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
         /* Initialize the Robot */
         drive = new MecanumDrive(hardwareMap, startPose);
@@ -110,9 +111,9 @@ public class BlueBoardWORLDS extends LinearOpMode {
         if (control.autoPosition == 3)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-36,56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,56), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,58), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
                     .build();
 
@@ -120,9 +121,9 @@ public class BlueBoardWORLDS extends LinearOpMode {
         else
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
         }
 
@@ -149,13 +150,13 @@ public class BlueBoardWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX,drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build()
         );
         drive.updatePoseEstimate();
 
         //grab 2 more white pixels
-        control.AutoPickupRoutineDrive(2.0);
+        control.AutoPickupRoutineDrive(2.2);
         drive.updatePoseEstimate();
 
         // Build up the Stack to Board Position 3 Trajectory
@@ -165,9 +166,10 @@ public class BlueBoardWORLDS extends LinearOpMode {
                 //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
                 //.setTangent(Math.toRadians(270))5
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(-55.5, 56), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,56), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,40), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX+1, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX+1, 58), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(46,58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46,40), Math.toRadians(180), speedUpVelocityConstraint)
                 .build();
         //drive to position 3
         Actions.runBlocking(new SequentialAction(
@@ -199,7 +201,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
                 .lineToX(45, slowDownVelocityConstraint)
-                .splineToLinearHeading(new Pose2d(48, 56, Math.toRadians(270)), Math.toRadians(270))
+                .strafeToLinearHeading(new Vector2d(48, 56), Math.toRadians(270))
                 .build();
         Actions.runBlocking(
                 new ParallelAction(
@@ -213,21 +215,22 @@ public class BlueBoardWORLDS extends LinearOpMode {
                         servoStop()
                 )
         );
+        control.autoTimeLeft = 30-getRuntime();
         telemetry.update();
     }
     public void BlueBoardDecision() {
         // Look for potential errors
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(47,42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,42,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(47,30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,30,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(47,36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,36,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(startPose)
                 .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
@@ -384,7 +387,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             //drive.updatePoseEstimate();
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
-                control.SlidesToAuto();
+                control.SlidesToAutoLow();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done

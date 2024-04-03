@@ -346,6 +346,13 @@ public class  UniversalControlClass {
         rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         SetSlidePower(SLIDE_POWER);
     }
+    public void SlidesToAutoLow(){
+        leftSlide.setTargetPosition(-200);
+        rightSlide.setTargetPosition(-200);
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        SetSlidePower(SLIDE_POWER);
+    }
     public void DeliverPixelToBoardPos(){
         armRotLeft.setPosition(.57);
         armRotRight.setPosition(.57);
