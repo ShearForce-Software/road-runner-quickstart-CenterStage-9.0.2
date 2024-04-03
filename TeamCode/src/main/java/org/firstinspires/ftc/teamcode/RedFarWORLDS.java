@@ -35,15 +35,17 @@ public class RedFarWORLDS extends LinearOpMode {
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
     double stackY = -12.0;
+    double stackX = -57.0;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
-        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
+        stackPose = new Pose2d(stackX, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
-        slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        // Define some custom constraints to use when wanting to go faster than defaults
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0);
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-40.0, 60.0);
+        slowDownVelocityConstraint = new TranslationalVelConstraint(5); 
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
         drive = new MecanumDrive(hardwareMap, startPose);
@@ -67,7 +69,8 @@ public class RedFarWORLDS extends LinearOpMode {
         DriveToStack = drive.actionBuilder(deliverToFloorPose)
                 .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
-                .lineToX(-57, slowDownVelocityConstraint)
+                //.lineToX(-59, slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         // ***************************************************
@@ -78,13 +81,27 @@ public class RedFarWORLDS extends LinearOpMode {
                         /* Drive to Floor Position */
                         new ParallelAction(
                                 lockPixels(),
-                                FloorTraj),
+                                FloorTraj,
+                                new SequentialAction(
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275)
+                                )
+                        ),
                         /* Deliver the Purple Pixel */
-                        dropOnLine(), //TODO -- takes too long, need to see if can split up and make parts of it parallel
+                        // Used to be DropOnLine action
+                        new SequentialAction(
+                                releasePurplePixel(),
+                                new SleepAction(.15),
+                                clearanceAfterPurpleDelivery()
+                        ),
+                        /* Drive to the stack of white pixels */
                         new ParallelAction(
                                 resetArm(),
                                 servoIntake(),
-                                DriveToStack)
+                                DriveToStack
+                        )
                 )
         );
         drive.updatePoseEstimate();
@@ -147,9 +164,11 @@ public class RedFarWORLDS extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 // Return to stack
                 .strafeToLinearHeading(new Vector2d(-52, stackY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
+        drive.useExtraCorrectionLogic = true;
         Actions.runBlocking(
                 new ParallelAction(
                         DriveBackToStack,
@@ -161,6 +180,7 @@ public class RedFarWORLDS extends LinearOpMode {
                         servoIntake()
                 )
         );
+        drive.useExtraCorrectionLogic = false;
 
 
         /* Use camera to make a minor adjustment to position if needed */
@@ -168,7 +188,7 @@ public class RedFarWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build()
         );
         drive.updatePoseEstimate();
@@ -179,8 +199,7 @@ public class RedFarWORLDS extends LinearOpMode {
 
         //drive to position 1
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
-                /* **** Pure swipe-strafe in trajectory **** */
+                .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
@@ -252,7 +271,7 @@ public class RedFarWORLDS extends LinearOpMode {
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 //.lineToX(-56, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-56, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
@@ -444,6 +463,97 @@ public class RedFarWORLDS extends LinearOpMode {
             packet.put("drop purple pixel on line", 0);
             return false;
             }
+    }
+
+    public Action prepareToDropPurplePixel() {
+        return new PrepareToDropPurplePixel();
+    }
+
+    public class PrepareToDropPurplePixel implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ArmRotationsPurplePixelDelivery();
+                control.WristRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("prepare to drop purple pixel on line", 0);
+            return false;
+        }
+    }
+
+    public Action armRotationsPurplePixelDelivery() {
+        return new ArmRotationsPurplePixelDelivery();
+    }
+
+    public class ArmRotationsPurplePixelDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ArmRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("Rotate Arm to deliver purple pixel on line", 0);
+            return false;
+        }
+    }
+    public Action wristRotationsPurplePixelDelivery() {
+        return new WristRotationsPurplePixelDelivery();
+    }
+
+    public class WristRotationsPurplePixelDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.WristRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("Adjust wrist to deliver the purple pixel on line", 0);
+            return false;
+        }
+    }
+
+
+    public Action releasePurplePixel() {
+        return new ReleasePurplePixel();
+    }
+
+    public class ReleasePurplePixel implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ReleasePurplePixel();
+                initialized = true;
+            }
+            packet.put("Release purple pixel on line", 0);
+            return false;
+        }
+    }
+
+    public Action clearanceAfterPurpleDelivery() {
+        return new ClearanceAfterPurpleDelivery();
+    }
+
+    public class ClearanceAfterPurpleDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ClearanceAfterPurpleDelivery();
+                initialized = true;
+            }
+            packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
+            return false;
+        }
     }
 }
 

@@ -41,10 +41,11 @@ public class BlueBoardWORLDS extends LinearOpMode {
         startPose = new Pose2d(12,62.5,Math.toRadians(270));
         stackPose = new Pose2d(stackX, stackY, Math.toRadians(180)); //-54.5,-11.5
 
-        speedUpVelocityConstraint = new TranslationalVelConstraint(70); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75, 75);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
-        slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        // Define some custom constraints to use when wanting to go faster than defaults
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0);
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-40.0, 60.0);
+        slowDownVelocityConstraint = new TranslationalVelConstraint(5); 
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
         drive = new MecanumDrive(hardwareMap, startPose);
@@ -53,6 +54,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
+        control.imuOffsetInDegrees = 270; // Math.toDegrees(startPose.heading.toDouble());
 
         while(!isStarted()){
             control.DetectTeamArtBlueBoard();
@@ -196,7 +198,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-        sleep(150);
+        //sleep(150);
 
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
@@ -215,8 +217,11 @@ public class BlueBoardWORLDS extends LinearOpMode {
                         servoStop()
                 )
         );
+
         control.autoTimeLeft = 30-getRuntime();
+        telemetry.addData("Time left", control.autoTimeLeft);
         telemetry.update();
+
     }
     public void BlueBoardDecision() {
         // Look for potential errors
@@ -263,7 +268,8 @@ public class BlueBoardWORLDS extends LinearOpMode {
                     .build();
         }
     }
-    public Action lockPixels(){return new BlueBoardWORLDS.LockPixels();}
+
+    public Action lockPixels(){return new LockPixels();}
     public class LockPixels implements Action{
         private boolean initialized = false;
         @Override
@@ -276,7 +282,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action dropOnLine(){return new BlueBoardWORLDS.DropOnLine();}
+    public Action dropOnLine(){return new DropOnLine();}
     public class DropOnLine implements Action{
         private boolean initialized = false;
         @Override
@@ -289,7 +295,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action resetArm(){return new BlueBoardWORLDS.ResetArm();}
+    public Action resetArm(){return new ResetArm();}
     public class ResetArm implements Action{
         private boolean initialized = false;
         @Override
@@ -302,7 +308,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action resetArmPurple(){return new BlueBoardWORLDS.ResetArmPurple();}
+    public Action resetArmPurple(){return new ResetArmPurple();}
     public class ResetArmPurple implements Action{
         private boolean initialized = false;
         @Override
@@ -315,7 +321,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action slidesDown(){return new BlueBoardWORLDS.SlidesDown();}
+    public Action slidesDown(){return new SlidesDown();}
     public class SlidesDown implements Action{
         private boolean initialized = false;
         @Override
@@ -328,7 +334,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab1(){return new BlueBoardWORLDS.AutoGrab1();}
+    public Action autoGrab1(){return new AutoGrab1();}
     public class AutoGrab1 implements Action{
         private boolean initialized = false;
         @Override
@@ -341,7 +347,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab2(){return new BlueBoardWORLDS.AutoGrab2();}
+    public Action autoGrab2(){return new AutoGrab2();}
     public class AutoGrab2 implements Action{
         private boolean initialized = false;
         @Override
@@ -354,7 +360,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoOuttake(){return new BlueBoardWORLDS.ServoOuttake();}
+    public Action servoOuttake(){return new ServoOuttake();}
     public class ServoOuttake implements Action{
         private boolean initialized = false;
         @Override
@@ -367,7 +373,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoIntake(){return new BlueBoardWORLDS.ServoIntake();}
+    public Action servoIntake(){return new ServoIntake();}
     public class ServoIntake implements Action{
         private boolean initialized = false;
         @Override
@@ -380,7 +386,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger1(){return new BlueBoardWORLDS.HalfwayTrigger1();}
+    public Action halfwayTrigger1(){return new HalfwayTrigger1();}
     public class HalfwayTrigger1 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -393,7 +399,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger2(){return new BlueBoardWORLDS.HalfwayTrigger2();}
+    public Action halfwayTrigger2(){return new HalfwayTrigger2();}
     public class HalfwayTrigger2 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -406,7 +412,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger3(){return new BlueBoardWORLDS.HalfwayTrigger3();}
+    public Action halfwayTrigger3(){return new HalfwayTrigger3();}
     public class HalfwayTrigger3 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -419,7 +425,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoStop(){return new BlueBoardWORLDS.ServoStop();}
+    public Action servoStop(){return new ServoStop();}
     public class ServoStop implements Action{
         private boolean initialized = false;
         @Override
@@ -430,7 +436,95 @@ public class BlueBoardWORLDS extends LinearOpMode {
             }
             packet.put("drop purple pixel on line", 0);
             return false;
+            }
+    }
+
+    public Action prepareToDropPurplePixel() {
+        return new PrepareToDropPurplePixel();
+    }
+
+    public class PrepareToDropPurplePixel implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ArmRotationsPurplePixelDelivery();
+                control.WristRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("prepare to drop purple pixel on line", 0);
+            return false;
         }
     }
+        public Action armRotationsPurplePixelDelivery() {
+            return new ArmRotationsPurplePixelDelivery();
+        }
+
+        public class ArmRotationsPurplePixelDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ArmRotationsPurplePixelDelivery();
+                    initialized = true;
+                }
+                packet.put("Rotate Arm to deliver purple pixel on line", 0);
+                return false;
+            }
+        }
+        public Action wristRotationsPurplePixelDelivery() {
+            return new WristRotationsPurplePixelDelivery();
+        }
+
+        public class WristRotationsPurplePixelDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.WristRotationsPurplePixelDelivery();
+                    initialized = true;
+                }
+                packet.put("Adjust wrist to deliver the purple pixel on line", 0);
+                return false;
+            }
+        }
+        public Action releasePurplePixel() {
+            return new ReleasePurplePixel();
+        }
+
+        public class ReleasePurplePixel implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ReleasePurplePixel();
+                    initialized = true;
+                }
+                packet.put("Release purple pixel on line", 0);
+                return false;
+            }
+        }
+
+        public Action clearanceAfterPurpleDelivery() {
+            return new ClearanceAfterPurpleDelivery();
+        }
+
+        public class ClearanceAfterPurpleDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ClearanceAfterPurpleDelivery();
+                    initialized = true;
+                }
+                packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
+                return false;
+            }
+        }
 }
 
