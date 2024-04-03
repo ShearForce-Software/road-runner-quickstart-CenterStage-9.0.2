@@ -194,8 +194,13 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
         else {
             deliverToFloorPose = new Pose2d(-36, 13.3, Math.toRadians(270));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-46, 33, Math.toRadians(270)), Math.toRadians(270))
-                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
+                    .splineToLinearHeading(new Pose2d(-48, 30, Math.toRadians(270)), Math.toRadians(270))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
+                    .build();
+            deliverToFloorPose = new Pose2d(-46.5, 15.5, Math.toRadians(225));
+            FloorTraj = myBot.getDrive().actionBuilder(startPose)
+                    .splineToLinearHeading(new Pose2d(-48, 30, Math.toRadians(270)), Math.toRadians(270))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
                     .build();
         }
     }

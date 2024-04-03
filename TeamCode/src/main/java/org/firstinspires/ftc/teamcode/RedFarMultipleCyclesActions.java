@@ -23,7 +23,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 //@Disabled
 @Autonomous(name="Red Far Multiple Cycles Actions", preselectTeleOp = "1 Manual Control")
 public class RedFarMultipleCyclesActions extends LinearOpMode {
-    UniversalControlClass control = new UniversalControlClass(true, false,this);
+    UniversalControlClass control = new UniversalControlClass(true, false, this);
     MecanumDrive drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
@@ -40,8 +40,8 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
     AccelConstraint slowDownAccelerationConstraint;
     double stackY = -12.0;
 
-    public void runOpMode(){
-        startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
+    public void runOpMode() {
+        startPose = new Pose2d(-36, -62.5, Math.toRadians(90));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
 
         speedUpVelocityConstraint = new TranslationalVelConstraint(75.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
@@ -59,7 +59,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         telemetry.update();
         control.imuOffsetInDegrees = 90; // Math.toDegrees(startPose.heading.toDouble());
 
-        while(!isStarted()){
+        while (!isStarted()) {
             control.DetectTeamArtRed();
             telemetry.update();//make decisions
             RedLeftPurplePixelDecision();
@@ -82,21 +82,27 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                         /* Drive to Floor Position */
                         new ParallelAction(
                                 lockPixels(),
-                                FloorTraj),
+                                FloorTraj,
+                                new SequentialAction(
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275)
+                                )
+                        ),
                         /* Deliver the Purple Pixel */
                         // Used to be DropOnLine action
                         new SequentialAction(
-                                prepareToDropPurplePixel(),
-                                new SleepAction(.275),
                                 releasePurplePixel(),
-                                new SleepAction(.125),
+                                new SleepAction(.15),
                                 clearanceAfterPurpleDelivery()
                         ),
                         /* Drive to the stack of white pixels */
                         new ParallelAction(
                                 resetArm(),
                                 servoIntake(),
-                                DriveToStack)
+                                DriveToStack
+                        )
                 )
         );
         drive.updatePoseEstimate();
@@ -142,9 +148,9 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         /* BACK UP FROM BOARD slightly so that the pixels fall off cleanly */
         drive.updatePoseEstimate();
         Actions.runBlocking(
-            drive.actionBuilder(drive.pose)
-                .lineToX(46)
-                .build());
+                drive.actionBuilder(drive.pose)
+                        .lineToX(46)
+                        .build());
 
         // **********************************************************
         // ******    Begin Logic to get an extra 2 White Pixels *****
@@ -164,7 +170,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                 .build();
 
-                //drive.useExtraCorrectionLogic = true;
+        //drive.useExtraCorrectionLogic = true;
         Actions.runBlocking(
                 new ParallelAction(
                         DriveBackToStack,
@@ -184,7 +190,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(-57,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(-57, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build()
         );
         drive.updatePoseEstimate();
@@ -214,7 +220,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                                         autoGrab2(),
                                         new SleepAction(.15),
                                         servoOuttake()
-                                        ),
+                                ),
                                 BoardTraj2,
                                 new SequentialAction(
                                         halfwayTrigger1(),
@@ -252,7 +258,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 )
         );
 
-        control.autoTimeLeft = 30-getRuntime();
+        control.autoTimeLeft = 30 - getRuntime();
         telemetry.addData("Time left", control.autoTimeLeft);
         telemetry.update();
     }
@@ -261,15 +267,15 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         // Look for potential errors
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(46,-30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46, -30, Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(46,-42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46, -42, Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(46,-36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46, -36, Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 //.lineToX(-56, slowDownVelocityConstraint)
@@ -283,21 +289,22 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, deliverToBoardPose.position.y), Math.toRadians(180))
                 .build();
     }
+
     public void RedLeftPurplePixelDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
             deliverToFloorPose = new Pose2d(-41, -20, Math.toRadians(45));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, -33, Math.toRadians(90)), Math.toRadians(90))
-                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(45))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(45))
                     .build();
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
             deliverToFloorPose = new Pose2d(-36, -34.5, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, -35.5, Math.toRadians(90)), Math.toRadians(90))
-                    .strafeToLinearHeading(new Vector2d(-27, -35.5), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(-42, -35.5, Math.toRadians(90)), Math.toRadians(90))
+                    .strafeToLinearHeading(new Vector2d(-35, -35.5), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
                     .build();
         }
@@ -311,9 +318,13 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         }
     }
 
-    public Action lockPixels(){return new LockPixels();}
-    public class LockPixels implements Action{
+    public Action lockPixels() {
+        return new LockPixels();
+    }
+
+    public class LockPixels implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -325,9 +336,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action dropOnLine(){return new DropOnLine();}
-    public class DropOnLine implements Action{
+
+    public Action dropOnLine() {
+        return new DropOnLine();
+    }
+
+    public class DropOnLine implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -338,9 +354,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action resetArm(){return new ResetArm();}
-    public class ResetArm implements Action{
+
+    public Action resetArm() {
+        return new ResetArm();
+    }
+
+    public class ResetArm implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -351,9 +372,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action slidesDown(){return new SlidesDown();}
-    public class SlidesDown implements Action{
+
+    public Action slidesDown() {
+        return new SlidesDown();
+    }
+
+    public class SlidesDown implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -364,9 +390,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab1(){return new AutoGrab1();}
-    public class AutoGrab1 implements Action{
+
+    public Action autoGrab1() {
+        return new AutoGrab1();
+    }
+
+    public class AutoGrab1 implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -377,9 +408,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab2(){return new AutoGrab2();}
-    public class AutoGrab2 implements Action{
+
+    public Action autoGrab2() {
+        return new AutoGrab2();
+    }
+
+    public class AutoGrab2 implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -390,9 +426,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoOuttake(){return new ServoOuttake();}
-    public class ServoOuttake implements Action{
+
+    public Action servoOuttake() {
+        return new ServoOuttake();
+    }
+
+    public class ServoOuttake implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -403,9 +444,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoIntake(){return new ServoIntake();}
-    public class ServoIntake implements Action{
+
+    public Action servoIntake() {
+        return new ServoIntake();
+    }
+
+    public class ServoIntake implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -416,8 +462,12 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger1(){return new HalfwayTrigger1();}
-    public class HalfwayTrigger1 implements Action{
+
+    public Action halfwayTrigger1() {
+        return new HalfwayTrigger1();
+    }
+
+    public class HalfwayTrigger1 implements Action {
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
             //drive.updatePoseEstimate();
@@ -429,8 +479,12 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger2(){return new HalfwayTrigger2();}
-    public class HalfwayTrigger2 implements Action{
+
+    public Action halfwayTrigger2() {
+        return new HalfwayTrigger2();
+    }
+
+    public class HalfwayTrigger2 implements Action {
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
             //drive.updatePoseEstimate();
@@ -442,8 +496,12 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger3(){return new HalfwayTrigger3();}
-    public class HalfwayTrigger3 implements Action{
+
+    public Action halfwayTrigger3() {
+        return new HalfwayTrigger3();
+    }
+
+    public class HalfwayTrigger3 implements Action {
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
             //drive.updatePoseEstimate();
@@ -455,9 +513,14 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action servoStop(){return new ServoStop();}
-    public class ServoStop implements Action{
+
+    public Action servoStop() {
+        return new ServoStop();
+    }
+
+    public class ServoStop implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -466,11 +529,16 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             }
             packet.put("drop purple pixel on line", 0);
             return false;
-            }
+        }
     }
-    public Action prepareToDropPurplePixel(){return new PrepareToDropPurplePixel();}
+
+    public Action prepareToDropPurplePixel() {
+        return new PrepareToDropPurplePixel();
+    }
+
     public class PrepareToDropPurplePixel implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -482,7 +550,47 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;
         }
     }
-    public Action releasePurplePixel(){ return new ReleasePurplePixel();}
+
+    public Action armRotationsPurplePixelDelivery() {
+        return new ArmRotationsPurplePixelDelivery();
+    }
+
+    public class ArmRotationsPurplePixelDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ArmRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("Rotate Arm to deliver purple pixel on line", 0);
+            return false;
+        }
+    }
+    public Action wristRotationsPurplePixelDelivery() {
+        return new WristRotationsPurplePixelDelivery();
+    }
+
+    public class WristRotationsPurplePixelDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.WristRotationsPurplePixelDelivery();
+                initialized = true;
+            }
+            packet.put("Adjust wrist to deliver the purple pixel on line", 0);
+            return false;
+        }
+    }
+
+
+    public Action releasePurplePixel() {
+        return new ReleasePurplePixel();
+    }
+
     public class ReleasePurplePixel implements Action {
         private boolean initialized = false;
 
@@ -496,7 +604,11 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
             return false;
         }
     }
-    public Action clearanceAfterPurpleDelivery(){ return new ClearanceAfterPurpleDelivery();}
+
+    public Action clearanceAfterPurpleDelivery() {
+        return new ClearanceAfterPurpleDelivery();
+    }
+
     public class ClearanceAfterPurpleDelivery implements Action {
         private boolean initialized = false;
 
@@ -511,4 +623,5 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         }
     }
 }
+
 

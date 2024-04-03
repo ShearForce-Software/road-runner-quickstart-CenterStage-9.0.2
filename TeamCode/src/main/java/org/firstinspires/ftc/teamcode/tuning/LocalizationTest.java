@@ -23,7 +23,7 @@ public class LocalizationTest extends LinearOpMode {
         if (TuningOpModes.DRIVE_CLASS.equals(MecanumDrive.class)) {
 
             // ZERO - ZERO- ZERO Start Position
-            startPose = new Pose2d(0,0,Math.toRadians(0));
+            //startPose = new Pose2d(0,0,Math.toRadians(0));
 
             // BLUE FAR
             //startPose = new Pose2d(-36,62.5,Math.toRadians(270));
@@ -35,7 +35,7 @@ public class LocalizationTest extends LinearOpMode {
             //startPose = new Pose2d(12,-62.5,Math.toRadians(90));
 
             // BLUE BOARD
-            //startPose = new Pose2d(12, 62.5, Math.toRadians(270));
+            startPose = new Pose2d(12, 62.5, Math.toRadians(270));
 
 
             MecanumDrive drive = new MecanumDrive(hardwareMap, startPose);

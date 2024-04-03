@@ -38,12 +38,12 @@ public class BlueFarWORLDS extends LinearOpMode {
 
     public void runOpMode(){
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
-        stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
+        stackPose = new Pose2d(-57, stackY, Math.toRadians(180)); //-54.5,-11.5
 
         speedUpVelocityConstraint = new TranslationalVelConstraint(75.0); //TODO Need to add a speed-up Velocity constraint to some of the trajectories
         speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
         /* Initialize the Robot */
         drive = new MecanumDrive(hardwareMap, startPose);
@@ -67,7 +67,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         DriveToStack = drive.actionBuilder(deliverToFloorPose)
                 .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
-                .lineToX(-57, slowDownVelocityConstraint)
+                .lineToX(-59, slowDownVelocityConstraint)
                 .build();
 
         // ***************************************************
@@ -305,10 +305,14 @@ public class BlueFarWORLDS extends LinearOpMode {
         }
         //***POSITION 2***
         else {
-            deliverToFloorPose = new Pose2d(-36, 13.3, Math.toRadians(270));
+            /*deliverToFloorPose = new Pose2d(-36, 13.3, Math.toRadians(270));
             FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-46, 33, Math.toRadians(270)), Math.toRadians(270))
-                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
+                    .splineToLinearHeading(new Pose2d(-46, 33, Math.toRadians(270)), Math.toRadians(270), null, slowDownAccelerationConstraint)
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270), null, slowDownAccelerationConstraint)
+                    .build();*/
+            deliverToFloorPose = new Pose2d(-46.5, 15.5, Math.toRadians(225));
+            FloorTraj = drive.actionBuilder(startPose)
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(225))
                     .build();
         }
     }

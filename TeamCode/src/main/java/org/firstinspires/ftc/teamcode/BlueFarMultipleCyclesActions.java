@@ -30,20 +30,15 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
     Action BoardTraj2;
     Action Park;
     Action DriveBackToStack;
-    VelConstraint speedUpVelocityConstraint;
-    AccelConstraint speedUpAccelerationConstraint;
-    VelConstraint slowDownVelocityConstraint;
-    AccelConstraint slowDownAccelerationConstraint;
+    public static VelConstraint speedUpVelocityConstraint = new TranslationalVelConstraint(70.0);
+    public static AccelConstraint speedUpAccelerationConstraint= new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
+    public static VelConstraint slowDownVelocityConstraint= new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
+    public static AccelConstraint slowDownAccelerationConstraint= new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
     double stackY = 12.0;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
         stackPose = new Pose2d(-55.5, stackY, Math.toRadians(180)); //-54.5,-11.5
-
-        speedUpVelocityConstraint = new TranslationalVelConstraint(70.0);
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
-        slowDownVelocityConstraint = new TranslationalVelConstraint(5); //TODO Need to add a slow-down Velocity constraint to some of the trajectories
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    //TODO need to determine is an acceleration constraint on some trajectories would be useful
 
         /* Initialize the Robot */
         drive = new MecanumDrive(hardwareMap, startPose);
@@ -79,7 +74,19 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
                         /* Drive to Floor Position */
                         new ParallelAction(
                                 lockPixels(),
-                                FloorTraj),
+                                FloorTraj,
+                                new SequentialAction(
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275)
+                                )
+                        ),
+                        new SequentialAction(
+                                releasePurplePixel(),
+                                new SleepAction(.15),
+                                clearanceAfterPurpleDelivery()
+                        ),
                         /* Deliver the Purple Pixel */
                         dropOnLine(), //TODO -- takes too long, need to see if can split up and make parts of it parallel
                         new ParallelAction(
@@ -480,8 +487,9 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
         }
     }
     public Action servoStop(){return new ServoStop();}
-    public class ServoStop implements Action{
+    public class ServoStop implements Action {
         private boolean initialized = false;
+
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
@@ -490,7 +498,77 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
             }
             packet.put("drop purple pixel on line", 0);
             return false;
-            }
+        }
     }
+        public Action armRotationsPurplePixelDelivery() {
+            return new ArmRotationsPurplePixelDelivery();
+        }
+
+        public class ArmRotationsPurplePixelDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ArmRotationsPurplePixelDelivery();
+                    initialized = true;
+                }
+                packet.put("Rotate Arm to deliver purple pixel on line", 0);
+                return false;
+            }
+        }
+        public Action wristRotationsPurplePixelDelivery() {
+            return new WristRotationsPurplePixelDelivery();
+        }
+
+        public class WristRotationsPurplePixelDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.WristRotationsPurplePixelDelivery();
+                    initialized = true;
+                }
+                packet.put("Adjust wrist to deliver the purple pixel on line", 0);
+                return false;
+            }
+        }
+        public Action releasePurplePixel() {
+            return new ReleasePurplePixel();
+        }
+
+        public class ReleasePurplePixel implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ReleasePurplePixel();
+                    initialized = true;
+                }
+                packet.put("Release purple pixel on line", 0);
+                return false;
+            }
+        }
+
+        public Action clearanceAfterPurpleDelivery() {
+            return new ClearanceAfterPurpleDelivery();
+        }
+
+        public class ClearanceAfterPurpleDelivery implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    control.ClearanceAfterPurpleDelivery();
+                    initialized = true;
+                }
+                packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
+                return false;
+            }
+        }
+
 }
 
