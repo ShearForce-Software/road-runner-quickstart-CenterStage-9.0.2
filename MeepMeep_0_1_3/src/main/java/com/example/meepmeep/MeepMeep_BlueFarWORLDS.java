@@ -53,7 +53,7 @@ public class MeepMeep_BlueFarWORLDS {
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 1;
+        autoPosition = 2;
 
         // Build up the floor delivery trajectory
         BlueRightPurplePixelDecision();
@@ -199,10 +199,11 @@ public class MeepMeep_BlueFarWORLDS {
         }
         //***POSITION 2***
         else {
-            deliverToFloorPose = new Pose2d(-36, 13.3, Math.toRadians(270));
+            deliverToFloorPose = new Pose2d(-42, 17, Math.toRadians(225));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-46, 33, Math.toRadians(270)), Math.toRadians(270))
-                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
+                    //.strafeToLinearHeading(new Vector2d(-42, 33), Math.toRadians(225))
+                    //.strafeToConstantHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y))
+                    .strafeToLinearHeading(new Vector2d(-46.5, 15.5), Math.toRadians(225))
                     .build();
         }
     }

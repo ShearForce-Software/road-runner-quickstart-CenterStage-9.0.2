@@ -54,7 +54,7 @@ public class MeepMeep_BlueBoardChris {
         // ********************************************
         /* Specify which Pixel Position will be run  */
         // ********************************************
-        autoPosition = 3;
+        autoPosition = 2;
 
         // Build up the start to board delivery trajectory
         //*****************************************************

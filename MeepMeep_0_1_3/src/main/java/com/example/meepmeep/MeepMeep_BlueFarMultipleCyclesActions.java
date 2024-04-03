@@ -24,7 +24,7 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
     static Action DriveBackToStack;
     static Action BoardTraj2;
     static RoadRunnerBotEntity myBot;
-    static int autoPosition = 1;
+    static int autoPosition = 2;
     static VelConstraint speedUpVelocityConstraint;
     static AccelConstraint speedUpAccelerationConstraint;
     static VelConstraint slowDownVelocityConstraint;
