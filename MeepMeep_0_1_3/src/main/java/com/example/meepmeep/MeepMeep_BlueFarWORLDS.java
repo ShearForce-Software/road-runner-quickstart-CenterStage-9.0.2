@@ -46,15 +46,15 @@ public class MeepMeep_BlueFarWORLDS {
                 .build();
 
         // Define some custom constraints to use when wanting to go faster than defaults
-        speedUpVelocityConstraint = new TranslationalVelConstraint(70.0); 
-        speedUpAccelerationConstraint = new ProfileAccelConstraint(-75.0, 75.0);    
+        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0);
+        speedUpAccelerationConstraint = new ProfileAccelConstraint(-40.0, 60.0);
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); 
-        slowDownAccelerationConstraint = new ProfileAccelConstraint(-30, 30);    
+        slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 2;
+        autoPosition = 1;
 
         // Build up the floor delivery trajectory
         BlueRightPurplePixelDecision();
