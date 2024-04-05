@@ -133,17 +133,24 @@ public class RedBoardWORLDS extends LinearOpMode {
                 new SequentialAction(
                         new ParallelAction(
                                 FloorTraj,
+                                slidesDown(),
                                 new SequentialAction(
-                                        resetArmPurple(),
-                                        new SleepAction(.15),
-                                        slidesDown()
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275)
                                 )
                         ),
-                        dropOnLine(),
+                        new SequentialAction(
+                                releasePurplePixel(),
+                                new SleepAction(.15),
+                                clearanceAfterPurpleDelivery()
+                        ),
                         new ParallelAction(
                                 resetArm(),
                                 servoIntake(),
-                                DriveToStack)
+                                DriveToStack
+                        )
                 )
         );
         drive.useExtraCorrectionLogic = false;
@@ -263,7 +270,7 @@ public class RedBoardWORLDS extends LinearOpMode {
                     .build();
         }
         else {
-            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(270));
+            deliverToFloorPose = new Pose2d(12, -38, Math.toRadians(270));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
                     .splineToLinearHeading(new Pose2d(12, -30, Math.toRadians(-90)), Math.toRadians(180))
                     .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
@@ -453,6 +460,7 @@ public class RedBoardWORLDS extends LinearOpMode {
             return false;
             }
     }
+
 
     public Action prepareToDropPurplePixel() {
         return new PrepareToDropPurplePixel();
