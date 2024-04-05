@@ -971,6 +971,41 @@ public class  UniversalControlClass {
             distanceCorrectionLR_HL = 0.0;
         }
     }
+    public void TagCorrectionFancy(){
+        HuskyLens.Block[] blocks = huskyLens2.blocks();
+        double timeout = opMode.getRuntime() + 0.15;
+
+        while ((blocks.length < 1) && (opMode.getRuntime() < timeout)) {
+            opMode.sleep(50);
+            blocks = huskyLens2.blocks();
+        }
+        if (blocks.length > 0){
+            int tagID = blocks[0].id;
+            double xVal = blocks[0].x;
+            pixelCorrectionAmountLR = xVal - 160;
+
+            double xWidth = blocks[0].width;
+            pixelWidth_HL = 2 / xWidth;
+
+            //CORRECT TAG
+            if(tagID==DESIRED_TAG_ID) {
+                distanceCorrectionLR_HL = pixelCorrectionAmountLR * pixelWidth_HL;
+            }
+            //TOO FAR LEFT - MOVE RIGHT
+            else if(tagID<DESIRED_TAG_ID){
+                distanceCorrectionLR_HL = pixelCorrectionAmountLR * pixelWidth_HL + 6;
+            }
+            //TOO FAR RIGHT = MOVE LEFT
+            else{
+                distanceCorrectionLR_HL = pixelCorrectionAmountLR * pixelWidth_HL - 6;
+            }
+        }
+        else{
+            opMode.telemetry.addData("WARNING **** - No April Tags in view - *****",0 );
+            opMode.telemetry.update();
+            distanceCorrectionLR_HL = 0.0;
+        }
+    }
     public void StackCorrectionHL(){
         HuskyLens.Block[] blocks = huskyLens.blocks();
         double timeout = opMode.getRuntime() + 0.15;

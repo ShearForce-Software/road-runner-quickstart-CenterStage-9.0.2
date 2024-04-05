@@ -35,7 +35,7 @@ public class RedBoardWORLDS extends LinearOpMode {
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
     double stackY = -36.0;
-    double stackX = -57.0;
+    double stackX = -58.0;
 
     public void runOpMode(){
         startPose = new Pose2d(12,-62.5,Math.toRadians(90));
@@ -87,7 +87,7 @@ public class RedBoardWORLDS extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrection();
+        control.TagCorrectionFancy();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -113,25 +113,22 @@ public class RedBoardWORLDS extends LinearOpMode {
         if (control.autoPosition == 1)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .splineToLinearHeading(new Pose2d(12,-56, Math.toRadians(180)), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-36,-56), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180), speedUpVelocityConstraint)
+                    .splineToLinearHeading(new Pose2d(12,-58, Math.toRadians(180)), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,-58), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,-58), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                     .build();
 
         }
         else
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,-56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-55.5,-56), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(12,-58), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,-58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
         }
 
-        drive.useExtraCorrectionLogic = true;
         Actions.runBlocking(
                 new SequentialAction(
                         new ParallelAction(
@@ -173,9 +170,10 @@ public class RedBoardWORLDS extends LinearOpMode {
                 //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
                 //.setTangent(Math.toRadians(270))5
                 //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(stackX + 1.0, -62), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,-62), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(47,-40), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX + 1.0, -58), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(46,-58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46,-40), Math.toRadians(180), speedUpVelocityConstraint)
                 .build();
         //drive to position 3
         Actions.runBlocking(new SequentialAction(
@@ -189,7 +187,7 @@ public class RedBoardWORLDS extends LinearOpMode {
                                 ),
                                 BoardTraj2,
                                 new SequentialAction(
-                                        halfwayTrigger1(),
+                                        halfwayTrigger1b(),
                                         new SleepAction(.15),
                                         halfwayTrigger2(),
                                         new SleepAction(.15),
@@ -207,7 +205,7 @@ public class RedBoardWORLDS extends LinearOpMode {
         /* Park the Robot, and Reset the Arm and slides */
         Park = drive.actionBuilder(drive.pose)
                 .lineToX(45, slowDownVelocityConstraint)
-                .splineToLinearHeading(new Pose2d(48, -56, Math.toRadians(90)), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(48, -56), Math.toRadians(90))
                 .build();
         Actions.runBlocking(
                 new ParallelAction(
@@ -247,9 +245,9 @@ public class RedBoardWORLDS extends LinearOpMode {
     }
     public void RedRightPurplePixelDecision() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(12, -33, Math.toRadians(0));
+            deliverToFloorPose = new Pose2d(12, -35, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(27,-33, Math.toRadians(0)), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(27,-35, Math.toRadians(0)), Math.toRadians(180))
                     //.setTangent(Math.toRadians(180))
                     .lineToX(0)
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
@@ -398,6 +396,19 @@ public class RedBoardWORLDS extends LinearOpMode {
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
                 control.SlidesToAutoLow();
+            }
+            packet.put("move arm trigger", 0);
+            return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action halfwayTrigger1b(){return new HalfwayTrigger1();}
+    public class HalfwayTrigger1b implements Action{
+        public boolean run(@NonNull TelemetryPacket packet) {
+            boolean moveArm = false;
+            //drive.updatePoseEstimate();
+            if (drive.pose.position.x >= 12) {
+                moveArm = true;
+                control.SlidesToAuto();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done

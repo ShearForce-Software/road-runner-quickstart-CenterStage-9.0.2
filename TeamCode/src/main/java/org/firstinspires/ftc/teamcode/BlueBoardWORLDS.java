@@ -87,7 +87,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrection();
+        control.TagCorrectionFancy();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -125,7 +125,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
                     .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180), null, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
         }
 

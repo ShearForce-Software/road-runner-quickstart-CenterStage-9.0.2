@@ -181,7 +181,7 @@ public class MeepMeep_RedFarWORLDS {
         // Look for potential errors
         //***POSITION 1***
         if (autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(46,-30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-29,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (autoPosition == 3) {

@@ -134,11 +134,11 @@ public class RedFarWORLDS extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrection();
+        control.TagCorrectionFancy();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build());
 
         /* release pixels on the board using the distance sensor to know when to stop */
@@ -203,7 +203,7 @@ public class RedFarWORLDS extends LinearOpMode {
                 .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, -33), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, -30), Math.toRadians(180))
                 .build();
 
         Actions.runBlocking(new SequentialAction(
@@ -259,15 +259,15 @@ public class RedFarWORLDS extends LinearOpMode {
         // Look for potential errors
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(46,-30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-27,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(46,-42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-39,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(46,-36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-33,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 //.lineToX(-56, slowDownVelocityConstraint)
@@ -282,7 +282,7 @@ public class RedFarWORLDS extends LinearOpMode {
     public void RedLeftPurplePixelDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-41, -20, Math.toRadians(45));
+            deliverToFloorPose = new Pose2d(-40, -20, Math.toRadians(45));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, -33, Math.toRadians(90)), Math.toRadians(90))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(45))
@@ -299,9 +299,9 @@ public class RedFarWORLDS extends LinearOpMode {
         }
         //***POSITION 2***
         else {
-            deliverToFloorPose = new Pose2d(-36, -12.5, Math.toRadians(90));
+            deliverToFloorPose = new Pose2d(-34, -11.5, Math.toRadians(90));
             FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-46, -33, Math.toRadians(90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-42, -33, Math.toRadians(90)), Math.toRadians(90))
                     .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
                     .build();
         }
