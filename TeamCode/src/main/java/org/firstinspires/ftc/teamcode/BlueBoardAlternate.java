@@ -29,6 +29,7 @@ public class BlueBoardAlternate extends LinearOpMode {
     Action DriveToStack;
     Action DriveBackToStack2;
     Action BoardTraj2;
+    Action BoardTraj3;
     Action Park;
     Action DriveBackToStack;
     VelConstraint speedUpVelocityConstraint;
@@ -72,9 +73,9 @@ public class BlueBoardAlternate extends LinearOpMode {
         /* Drive to the Board */
         Actions.runBlocking(
                 new SequentialAction(
-                        lockPixels(),
                         /* Drive to the board while moving arm up to scoring position after crossing the half-way point */
                         new ParallelAction(
+                                lockPixels(),
                                 BoardTraj2,
                                 new SequentialAction(
                                         halfwayTrigger1(),
@@ -177,7 +178,7 @@ public class BlueBoardAlternate extends LinearOpMode {
         //*****************************************************
         if (control.autoPosition == 2) {
             BoardTraj2 = drive.actionBuilder(drive.pose)
-                    .strafeToLinearHeading(new Vector2d(-53, stackY), Math.toRadians(180),slowDownVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-55, stackY), Math.toRadians(180),slowDownVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(-24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(-12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
@@ -209,7 +210,7 @@ public class BlueBoardAlternate extends LinearOpMode {
         //drive to position 3
         Actions.runBlocking(new SequentialAction(
                         autoGrab1(),
-                        new SleepAction(.5),
+                        new SleepAction(.25),
                         new ParallelAction(
                                 new SequentialAction(
                                         autoGrab2(),
@@ -218,7 +219,7 @@ public class BlueBoardAlternate extends LinearOpMode {
                                 ),
                                 BoardTraj2,
                                 new SequentialAction(
-                                        halfwayTrigger1(),
+                                        halfwayTrigger1b(),
                                         new SleepAction(.15),
                                         halfwayTrigger2(),
                                         new SleepAction(.15),
@@ -230,6 +231,11 @@ public class BlueBoardAlternate extends LinearOpMode {
 
         //deliver two white pixels
         control.StopNearBoardAuto(true);
+        drive.updatePoseEstimate();
+       Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .lineToX(46)
+                        .build());
         drive.updatePoseEstimate();
         //sleep(150);
 
@@ -243,8 +249,9 @@ public class BlueBoardAlternate extends LinearOpMode {
                         .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                         .build();
             } else if (control.autoPosition == 2) {
-                DriveBackToStack2 = drive.actionBuilder(new Pose2d(47, stackY, Math.toRadians(180)))
-                        .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                DriveBackToStack2 = drive.actionBuilder(drive.pose)
+                       // .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(44, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                         .strafeToLinearHeading(new Vector2d(24, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                         .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                         .strafeToLinearHeading(new Vector2d(-12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
@@ -263,7 +270,11 @@ public class BlueBoardAlternate extends LinearOpMode {
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
-                                    resetArm(),
+                                    new SequentialAction(
+                                            resetArm(),
+                                            new SleepAction(.15),
+                                            slidesDown()
+                                    ),
                                     servoIntake(),
                                     DriveBackToStack2)
                     )
@@ -283,18 +294,50 @@ public class BlueBoardAlternate extends LinearOpMode {
             control.AutoPickupRoutineDrive(2.2);
             drive.updatePoseEstimate();
 
+            if (control.autoPosition == 2) {
+                BoardTraj3 = drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(new Vector2d(-55, stackY), Math.toRadians(180),slowDownVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(-24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(-12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(46,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(47,stackY), Math.toRadians(180),slowDownVelocityConstraint)
+                        // turn and go through center rigging
+                        // .turnTo(Math.toRadians(180))
+                        //  .strafeToLinearHeading(new Vector2d(-36,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        // .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+
+
+                        .build();
+            }
+            else {
+                BoardTraj3 = drive.actionBuilder(drive.pose)
+                        //.setTangent(0)
+                        //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                        //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
+                        //.setTangent(Math.toRadians(270))5
+                        //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
+                        .strafeToLinearHeading(new Vector2d(stackX+1, stackY), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX+1, 58), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(46,58), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(46,40), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(47,40), Math.toRadians(180),slowDownVelocityConstraint)
+                        .build();
+            }
+
             Actions.runBlocking(new SequentialAction(
                             autoGrab1(),
-                            new SleepAction(.5),
+                            new SleepAction(.25),
                             new ParallelAction(
                                     new SequentialAction(
                                             autoGrab2(),
                                             new SleepAction(.15),
                                             servoOuttake()
                                     ),
-                                    BoardTraj2,
+                                    BoardTraj3,
                                     new SequentialAction(
-                                            halfwayTrigger1(),
+                                            halfwayTrigger1b(),
                                             new SleepAction(.15),
                                             halfwayTrigger2(),
                                             new SleepAction(.15),
@@ -305,19 +348,19 @@ public class BlueBoardAlternate extends LinearOpMode {
             );
             //deliver two white pixels
             control.StopNearBoardAuto(true);
-            drive.updatePoseEstimate();
+
             //sleep(150);
         }
-
+        drive.updatePoseEstimate();
         /* Park the Robot, and Reset the Arm and slides */
         if (control.autoPosition == 2) {
-            Park = drive.actionBuilder(new Pose2d(47, stackY, Math.toRadians(180)))
+            Park = drive.actionBuilder(drive.pose)
                     .lineToX(45, slowDownVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(46, 45), Math.toRadians(270))
                     .build();
         }
         else {
-            Park = drive.actionBuilder(new Pose2d(47, 40, Math.toRadians(180)))
+            Park = drive.actionBuilder(drive.pose)
                     .lineToX(45, slowDownVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(48, 56), Math.toRadians(270))
                     .build();
@@ -512,6 +555,19 @@ public class BlueBoardAlternate extends LinearOpMode {
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
                 control.SlidesToAutoLow();
+            }
+            packet.put("move arm trigger", 0);
+            return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action halfwayTrigger1b(){return new HalfwayTrigger1b();}
+    public class HalfwayTrigger1b implements Action{
+        public boolean run(@NonNull TelemetryPacket packet) {
+            boolean moveArm = false;
+            //drive.updatePoseEstimate();
+            if (drive.pose.position.x >= 12) {
+                moveArm = true;
+                control.SlidesLow();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done

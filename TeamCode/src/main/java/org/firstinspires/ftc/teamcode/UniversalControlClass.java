@@ -429,7 +429,7 @@ public class  UniversalControlClass {
                     forward = false;
                 }
                 else{
-                    moveRobot(.75, 0, 0);
+                    moveRobot(.25, 0, 0);
                     forward = true;
                 }
             }
