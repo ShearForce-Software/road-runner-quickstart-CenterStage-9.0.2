@@ -241,12 +241,6 @@ public class RedBoardAlternate extends LinearOpMode {
         drive.updatePoseEstimate();
         //sleep(150);
 
-        /* Park the Robot, and Reset the Arm and slides */
-        Park = drive.actionBuilder(drive.pose)
-                .lineToX(45, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(48, -56), Math.toRadians(90))
-                .build();
-        drive.updatePoseEstimate();
 
         //*****START SECOND CYCLE ON POSITION 2*****//
         if (control.autoPosition == 2) {
@@ -325,11 +319,14 @@ public class RedBoardAlternate extends LinearOpMode {
             );
             //deliver two white pixels
             control.StopNearBoardAuto(true);
-            Park = drive.actionBuilder(drive.pose)
-                    .lineToX(45, slowDownVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(46, 45), Math.toRadians(270))
-                    .build();
         }//*****END POSITION 2 SECOND CYCLE*****//
+
+        /* Park the Robot, and Reset the Arm and slides */
+        drive.updatePoseEstimate();
+        Park = drive.actionBuilder(drive.pose)
+                .lineToX(45, slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46, -45), Math.toRadians(90))
+                .build();
 
         Actions.runBlocking(
                 new ParallelAction(
