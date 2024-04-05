@@ -147,10 +147,13 @@ public class RedBoardWORLDS extends LinearOpMode {
                         new SequentialAction(
                                 releasePurplePixel(),
                                 new SleepAction(.15),
-                                clearanceAfterPurpleDelivery(),
-                                resetArm()
-
-                                )
+                                clearanceAfterPurpleDelivery()
+                        ),
+                        new ParallelAction(
+                                resetArm(),
+                                servoIntake(),
+                                DriveToStack
+                        )
                 )
         );
         drive.useExtraCorrectionLogic = false;
