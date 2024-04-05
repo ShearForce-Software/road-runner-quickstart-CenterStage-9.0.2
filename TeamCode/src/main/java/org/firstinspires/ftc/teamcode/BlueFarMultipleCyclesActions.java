@@ -330,10 +330,12 @@ public class BlueFarMultipleCyclesActions extends LinearOpMode {
     public void BlueRightPurplePixelDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-36, 33, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(-37, 31
+                    , Math.toRadians(180));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
-                    .strafeToLinearHeading(new Vector2d(-27, 35.5), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-31, 34
+                    ), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
                     .build();
         }

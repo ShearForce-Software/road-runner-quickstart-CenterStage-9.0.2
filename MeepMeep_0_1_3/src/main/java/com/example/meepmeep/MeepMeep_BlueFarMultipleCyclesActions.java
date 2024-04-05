@@ -54,7 +54,7 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 2;
+        autoPosition = 1;
 
         // Build up the floor delivery trajectory
         BlueLeftPurplePixelDecision();
@@ -182,10 +182,10 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
     static public void BlueLeftPurplePixelDecision() {
         //***POSITION 1***
         if (autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-36, 33, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(-40, 33, Math.toRadians(180));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
-                    .strafeToLinearHeading(new Vector2d(-27, 35.5), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-31, 34), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
                     .build();
         }
@@ -201,6 +201,9 @@ public class MeepMeep_BlueFarMultipleCyclesActions {
         //***POSITION 2***
         else {
             /*deliverToFloorPose = new Pose2d(-36, 13.3, Math.toRadians(270));
+
+
+
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-46, 33, Math.toRadians(270)), Math.toRadians(270), null, slowDownAccelerationConstraint)
                     .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270), null, slowDownAccelerationConstraint)
