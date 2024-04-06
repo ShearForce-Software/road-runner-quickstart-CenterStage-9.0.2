@@ -70,7 +70,7 @@ public class BlueFarWORLDS extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                 //.lineToX(-59, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         // ***************************************************
@@ -82,9 +82,20 @@ public class BlueFarWORLDS extends LinearOpMode {
                         /* Drive to Floor Position */
                         new ParallelAction(
                                 lockPixels(),
-                                FloorTraj),
+                                FloorTraj,
+                                new SequentialAction(
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275))
+                                ),
+
+                                new SequentialAction(
+                                        releasePurplePixel(),
+                                        new SleepAction(.15),
+                                        clearanceAfterPurpleDelivery()),
                         /* Deliver the Purple Pixel */
-                        dropOnLine(), 
+                     //   dropOnLine(),
                         new ParallelAction(
                                 resetArm(),
                                 servoIntake(),
@@ -156,7 +167,7 @@ public class BlueFarWORLDS extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-52, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         drive.useExtraCorrectionLogic = true;
@@ -288,10 +299,10 @@ public class BlueFarWORLDS extends LinearOpMode {
     public void BlueRightPurplePixelDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-36, 33, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(-37, 31, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
-                    .strafeToLinearHeading(new Vector2d(-27, 35.5), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-31, 34), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
                     .build();
         }

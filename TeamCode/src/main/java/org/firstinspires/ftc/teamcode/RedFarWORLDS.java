@@ -70,7 +70,7 @@ public class RedFarWORLDS extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                 //.lineToX(-59, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         // ***************************************************
@@ -165,7 +165,7 @@ public class RedFarWORLDS extends LinearOpMode {
                 // Return to stack
                 .strafeToLinearHeading(new Vector2d(-52, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackX - 2.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         drive.useExtraCorrectionLogic = true;
@@ -282,9 +282,9 @@ public class RedFarWORLDS extends LinearOpMode {
     public void RedLeftPurplePixelDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-40, -20, Math.toRadians(45));
+            deliverToFloorPose = new Pose2d(-41, -20, Math.toRadians(45));
             FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, -33, Math.toRadians(90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-38.5, -35.5, Math.toRadians(90)), Math.toRadians(90))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(45))
                     .build();
         }
@@ -301,7 +301,7 @@ public class RedFarWORLDS extends LinearOpMode {
         else {
             deliverToFloorPose = new Pose2d(-34, -11.5, Math.toRadians(90));
             FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-42, -33, Math.toRadians(90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-46, -33, Math.toRadians(90)), Math.toRadians(90))
                     .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
                     .build();
         }

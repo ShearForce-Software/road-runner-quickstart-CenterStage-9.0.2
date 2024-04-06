@@ -113,9 +113,9 @@ public class BlueBoardWORLDS extends LinearOpMode {
         if (control.autoPosition == 3)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-36,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(12,58.5), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-36,58.5), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,58.5), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
 
@@ -123,8 +123,8 @@ public class BlueBoardWORLDS extends LinearOpMode {
         else
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(12,58.5), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,58.5), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
         }
@@ -192,7 +192,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
                                 ),
                                 BoardTraj2,
                                 new SequentialAction(
-                                        halfwayTrigger1(),
+                                        halfwayTrigger1b(),
                                         new SleepAction(.15),
                                         halfwayTrigger2(),
                                         new SleepAction(.15),
@@ -401,6 +401,19 @@ public class BlueBoardWORLDS extends LinearOpMode {
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
                 control.SlidesToAutoLow();
+            }
+            packet.put("move arm trigger", 0);
+            return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action halfwayTrigger1b(){return new HalfwayTrigger1b();}
+    public class HalfwayTrigger1b implements Action{
+        public boolean run(@NonNull TelemetryPacket packet) {
+            boolean moveArm = false;
+            //drive.updatePoseEstimate();
+            if (drive.pose.position.x >= 12) {
+                moveArm = true;
+                control.SlidesLow();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done

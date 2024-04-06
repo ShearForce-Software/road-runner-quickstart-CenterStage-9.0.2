@@ -288,7 +288,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         if (control.autoPosition == 1) {
             deliverToFloorPose = new Pose2d(-41, -20, Math.toRadians(45));
             FloorTraj = drive.actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, -33, Math.toRadians(90)), Math.toRadians(90))
+                    .splineToLinearHeading(new Pose2d(-38.5, -35.5, Math.toRadians(90)), Math.toRadians(90))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(45))
                     .build();
         }
@@ -303,7 +303,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         }
         //***POSITION 2***
         else {
-            deliverToFloorPose = new Pose2d(-36, -12.5, Math.toRadians(90));
+            deliverToFloorPose = new Pose2d(-34, -11.5, Math.toRadians(90));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-46, -33, Math.toRadians(90)), Math.toRadians(90))
                     .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
