@@ -87,7 +87,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrectionFancy();
+        control.TagCorrection();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -115,8 +115,8 @@ public class BlueBoardWORLDS extends LinearOpMode {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
                     .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(-36,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
 
         }
@@ -133,17 +133,24 @@ public class BlueBoardWORLDS extends LinearOpMode {
                 new SequentialAction(
                         new ParallelAction(
                                 FloorTraj,
+                                slidesDown(),
                                 new SequentialAction(
-                                        resetArmPurple(),
-                                        new SleepAction(.15),
-                                        slidesDown()
+                                        new SleepAction(.25),
+                                        armRotationsPurplePixelDelivery(),
+                                        wristRotationsPurplePixelDelivery(),
+                                        new SleepAction(.275)
                                 )
                         ),
-                        dropOnLine(),
+                        new SequentialAction(
+                              releasePurplePixel(),
+                                new SleepAction(.15),
+                                clearanceAfterPurpleDelivery()
+                        ),
                         new ParallelAction(
                                 resetArm(),
                                 servoIntake(),
-                                DriveToStack)
+                                DriveToStack
+                        )
                 )
         );
         drive.updatePoseEstimate();
@@ -243,18 +250,18 @@ public class BlueBoardWORLDS extends LinearOpMode {
     }
     public void BlueBoardPurplePixelDecision() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(10.5, 30, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
                     .setTangent(Math.toRadians(180))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(0));
+            deliverToFloorPose = new Pose2d(12, 30, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(27, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(12, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
                     //.setTangent(Math.toRadians(180))
-                    .lineToX(0)
+                   // .lineToX(0)
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
                     //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
                     //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
@@ -263,7 +270,7 @@ public class BlueBoardWORLDS extends LinearOpMode {
         else {
             deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(90));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(12, 30, Math.toRadians(90)), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(12, 36, Math.toRadians(90)), Math.toRadians(180))
                     .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
                     .build();
         }

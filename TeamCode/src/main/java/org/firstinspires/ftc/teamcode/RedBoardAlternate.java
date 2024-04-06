@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 //@Disabled
-@Autonomous(name="Red Board WORLDS", preselectTeleOp = "1 Manual Control")
+@Autonomous(name="Red Board Alternate", preselectTeleOp = "1 Manual Control")
 public class RedBoardAlternate extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);
     MecanumDrive drive;
