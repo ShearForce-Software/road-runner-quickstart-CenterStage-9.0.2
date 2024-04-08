@@ -67,8 +67,8 @@ public class RedFarWORLDS extends LinearOpMode {
 
         // Create the floor to Stack trajectory
         DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(stackX+5, stackY, Math.toRadians(180)), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
                 //.lineToX(-59, slowDownVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
@@ -107,7 +107,7 @@ public class RedFarWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
 
         /* Pick up a White Pixel from the stack */
-        control.AutoPickupRoutineDrive(1.5);
+        control.AutoPickupRoutineDrive(2.2);
         drive.updatePoseEstimate();
 
         /* Drive to the board while moving arm up to scoring position after crossing the half-way point */
@@ -161,11 +161,13 @@ public class RedFarWORLDS extends LinearOpMode {
                 /* **** Pure strafe out trajectory **** */
                 .strafeToLinearHeading(new Vector2d(30, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 // Return to stack
                 .strafeToLinearHeading(new Vector2d(-52, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX+5, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                //.strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         drive.useExtraCorrectionLogic = true;
@@ -188,7 +190,7 @@ public class RedFarWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(stackX,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180), slowDownVelocityConstraint)
                         .build()
         );
         drive.updatePoseEstimate();
@@ -201,6 +203,7 @@ public class RedFarWORLDS extends LinearOpMode {
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(-12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(deliverToBoardPose.position.x, -30), Math.toRadians(180))
@@ -273,6 +276,7 @@ public class RedFarWORLDS extends LinearOpMode {
                 //.lineToX(-56, slowDownVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(-36, stackY), speedUpVelocityConstraint)
+                .strafeToConstantHeading(new Vector2d(-12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(12, stackY), speedUpVelocityConstraint)
                 .strafeToConstantHeading(new Vector2d(30, stackY), speedUpVelocityConstraint)
                 /* **** Pure swipe-strafe in trajectory **** */
