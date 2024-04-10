@@ -38,6 +38,7 @@ public class BlueBoardAlternate extends LinearOpMode {
     AccelConstraint slowDownAccelerationConstraint;
     double stackY = 36;
     double stackX = -58;
+	double wallDriveY = 58.5;
 
     public void runOpMode(){
         startPose = new Pose2d(12,62.5,Math.toRadians(270));
@@ -78,11 +79,11 @@ public class BlueBoardAlternate extends LinearOpMode {
                                 lockPixels(),
                                 BoardTraj2,
                                 new SequentialAction(
-                                        halfwayTrigger1(),
+                                        halfwayTrigger1_raiseSlidesToAutoLow(),
                                         new SleepAction(.15),
-                                        halfwayTrigger2(),
+                                        halfwayTrigger2_moveArmToBoardDeliverPos(),
                                         new SleepAction(.15),
-                                        halfwayTrigger3()
+                                        halfwayTrigger3_moveWristToBoardDeliverPos()
                                 )
                         )
                 )
@@ -115,10 +116,11 @@ public class BlueBoardAlternate extends LinearOpMode {
         if (control.autoPosition == 3)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-36,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,wallDriveY), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(-36,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX + 1.0,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
 
         }
@@ -135,8 +137,10 @@ public class BlueBoardAlternate extends LinearOpMode {
         else
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(12,58), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(stackX,58), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(12,wallDriveY), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(-12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(-36,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX + 1.0, wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .build();
         }
@@ -165,18 +169,18 @@ public class BlueBoardAlternate extends LinearOpMode {
                         )
                 )
         );
-        drive.updatePoseEstimate();
 
+
+        /* Use camera to make a minor adjustment to position if needed */
         control.StackCorrectionHL();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(stackX,drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build()
         );
-        drive.updatePoseEstimate();
 
-        //grab 2 more white pixels
+        //intake 2 more white pixels
         control.AutoPickupRoutineDrive(2.2);
         drive.updatePoseEstimate();
 
@@ -201,60 +205,56 @@ public class BlueBoardAlternate extends LinearOpMode {
         }
         else {
         BoardTraj2 = drive.actionBuilder(drive.pose)
-                //.setTangent(0)
-                //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
-                //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
-                //.setTangent(Math.toRadians(270))5
-                //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                .strafeToLinearHeading(new Vector2d(stackX+1, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackX+1, 58), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(46,58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(stackX + 1.0, wallDriveY), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(-46,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(46,40), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(47,40), Math.toRadians(180),slowDownVelocityConstraint)
                 .build();
         }
-        //drive to position 3
+        // Pick up the White Pixels and then drive to position 1 (or 2), while lifting slides (after halfway)
         Actions.runBlocking(new SequentialAction(
-                        autoGrab1(),
-                        new SleepAction(.25),
-                        new ParallelAction(
-                                new SequentialAction(
-                                        autoGrab2(),
-                                        new SleepAction(.15),
-                                        servoOuttake()
-                                ),
-                                BoardTraj2,
-                                new SequentialAction(
-                                        halfwayTrigger1b(),
-                                        new SleepAction(.15),
-                                        halfwayTrigger2(),
-                                        new SleepAction(.15),
-                                        halfwayTrigger3()
-                                )
+                positionArmWristToGrab(),
+                new SleepAction(.25),
+                autograb(),
+                new SleepAction(.25),
+                new ParallelAction(
+                        new SequentialAction(
+                                pickUpWhitePixels(),
+                                new SleepAction(.3),
+                                servoOuttake()
+                        ),
+                        new SequentialAction(
+                                new SleepAction(.15),
+                                BoardTraj2
+                        ),
+                        new SequentialAction(
+                                halfwayTrigger1b_raiseSlidesToAutoHeight(),
+                                new SleepAction(.15),
+                                halfwayTrigger2_moveArmToBoardDeliverPos(),
+                                new SleepAction(.15),
+                                halfwayTrigger3_moveWristToBoardDeliverPos()
                         )
+                )
                 )
         );
 
         //deliver two white pixels
         control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
-       Actions.runBlocking(
+        Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .lineToX(46)
                         .build());
         drive.updatePoseEstimate();
-        //sleep(150);
 
+
+        //*****START SECOND CYCLE ON POSITION 2*****//
         if (control.autoPosition == 2) {
             // Build up the Board to Stack Trajectory (Second Stack Run)
             //*****************************************************
-            if (control.autoPosition == 1) {
-                DriveBackToStack2 = drive.actionBuilder(new Pose2d(47, 36, Math.toRadians(180)))
-                        .strafeToLinearHeading(new Vector2d(24, 60), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(-53, 60), Math.toRadians(180), speedUpVelocityConstraint)
-                        .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
-                        .build();
-            } else if (control.autoPosition == 2) {
                 DriveBackToStack2 = drive.actionBuilder(drive.pose)
                        // .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                         .strafeToLinearHeading(new Vector2d(44, stackY), Math.toRadians(180), speedUpVelocityConstraint)
@@ -265,13 +265,6 @@ public class BlueBoardAlternate extends LinearOpMode {
                         .strafeToLinearHeading(new Vector2d(-53, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                         .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
                         .build();
-            } else {
-                DriveBackToStack2 = drive.actionBuilder(new Pose2d(47, 36, Math.toRadians(180)))
-                        .strafeToLinearHeading(new Vector2d(24, 60), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(-53, 60), Math.toRadians(180), speedUpVelocityConstraint)
-                        .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackPose.position.y), Math.toRadians(180), slowDownVelocityConstraint)
-                        .build();
-            }
 
             Actions.runBlocking(
                     new SequentialAction(
@@ -300,7 +293,6 @@ public class BlueBoardAlternate extends LinearOpMode {
             control.AutoPickupRoutineDrive(2.2);
             drive.updatePoseEstimate();
 
-            if (control.autoPosition == 2) {
                 BoardTraj3 = drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(new Vector2d(-55, stackY), Math.toRadians(180),slowDownVelocityConstraint)
                         .strafeToLinearHeading(new Vector2d(-24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
@@ -316,61 +308,44 @@ public class BlueBoardAlternate extends LinearOpMode {
 
 
                         .build();
-            }
-            else {
-                BoardTraj3 = drive.actionBuilder(drive.pose)
-                        //.setTangent(0)
-                        //.splineToLinearHeading(new Pose2d(-30, -11.5, Math.toRadians(180)), Math.toRadians(0))
-                        //.splineToLinearHeading(new Pose2d(47.5, -11.5, Math.toRadians(180)), Math.toRadians(0))
-                        //.setTangent(Math.toRadians(270))5
-                        //.splineToLinearHeading(deliverToBoardPose, Math.toRadians(270))
-                        .strafeToLinearHeading(new Vector2d(stackX+1, stackY), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(stackX+1, 58), Math.toRadians(180))
-                        .strafeToLinearHeading(new Vector2d(46,58), Math.toRadians(180), speedUpVelocityConstraint)
-                        .strafeToLinearHeading(new Vector2d(46,40), Math.toRadians(180), speedUpVelocityConstraint)
-                        .strafeToLinearHeading(new Vector2d(47,40), Math.toRadians(180),slowDownVelocityConstraint)
-                        .build();
-            }
 
+            // Pick up the White Pixels and then drive to position 1 (or 2), while lifting slides (after halfway)
             Actions.runBlocking(new SequentialAction(
-                            autoGrab1(),
+                            positionArmWristToGrab(),
+                            new SleepAction(.25),
+                            autograb(),
                             new SleepAction(.25),
                             new ParallelAction(
                                     new SequentialAction(
-                                            autoGrab2(),
-                                            new SleepAction(.15),
+                                            pickUpWhitePixels(),
+                                            new SleepAction(.3),
                                             servoOuttake()
                                     ),
-                                    BoardTraj3,
                                     new SequentialAction(
-                                            halfwayTrigger1b(),
                                             new SleepAction(.15),
-                                            halfwayTrigger2(),
+                                            BoardTraj3
+                                    ),
+                                    new SequentialAction(
+                                            halfwayTrigger1b_raiseSlidesToAutoHeight(),
                                             new SleepAction(.15),
-                                            halfwayTrigger3()
+                                            halfwayTrigger2_moveArmToBoardDeliverPos(),
+                                            new SleepAction(.15),
+                                            halfwayTrigger3_moveWristToBoardDeliverPos()
                                     )
                             )
                     )
             );
-            //deliver two white pixels
+            //deliver two MORE white pixels
             control.StopNearBoardAuto(true);
+        }//*****END POSITION 2 SECOND CYCLE*****//
 
-            //sleep(150);
-        }
+        /* Park the Robot, and Reset the Arm and slides */
         drive.updatePoseEstimate();
         /* Park the Robot, and Reset the Arm and slides */
-        if (control.autoPosition == 2) {
             Park = drive.actionBuilder(drive.pose)
                     .lineToX(45, slowDownVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(46, 45), Math.toRadians(270))
                     .build();
-        }
-        else {
-            Park = drive.actionBuilder(drive.pose)
-                    .lineToX(45, slowDownVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(48, 56), Math.toRadians(270))
-                    .build();
-        }
         Actions.runBlocking(
                 new ParallelAction(
                         Park,
@@ -409,21 +384,17 @@ public class BlueBoardAlternate extends LinearOpMode {
     }
     public void BlueBoardPurplePixelDecision() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(12, 33, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(10.5, 30, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
                     .setTangent(Math.toRadians(180))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(0));
+            deliverToFloorPose = new Pose2d(12, 30, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(27, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
-                    //.setTangent(Math.toRadians(180))
-                    .lineToX(0)
+                    .splineToLinearHeading(new Pose2d(12, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
-                    //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
-                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
                     .build();
         }
         else {
@@ -431,7 +402,6 @@ public class BlueBoardAlternate extends LinearOpMode {
             FloorTraj = drive.actionBuilder(drive.pose)
                     .splineToLinearHeading(new Pose2d(12, 30, Math.toRadians(90)), Math.toRadians(180))
                     .strafeTo(new Vector2d(deliverToFloorPose.position.x,deliverToFloorPose.position.y))
-                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
                     .build();
         }
     }
@@ -455,7 +425,7 @@ public class BlueBoardAlternate extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.DropOnLine(); //TODO split up this logic, it has a bunch of sleeps in it, should do some of this in parallel with driving
+                control.DropOnLine();
                 initialized = true;
             }
             packet.put("drop purple pixel on line", 0);
@@ -501,26 +471,41 @@ public class BlueBoardAlternate extends LinearOpMode {
             return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab1(){return new AutoGrab1();}
+    public Action positionArmWristToGrab(){return new AutoGrab1();}
     public class AutoGrab1 implements Action{
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.AutoPickupRoutineStopAndLower();
+                // Stop the spinners and
+                // Move arm and wrist down to grab the pixels
+                control.AutoPickupRoutineStopAndLowerOnly();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab2(){return new AutoGrab2();}
+    public Action pickUpWhitePixels(){return new AutoGrab2();}
     public class AutoGrab2 implements Action{
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 control.AutoPickupRoutineGrabAndUp();
+                initialized = true;
+            }
+            packet.put("servoIntake", 0);
+            return false;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action autograb(){return new Grab();}
+    public class Grab implements Action{
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.GrabPixels();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
@@ -553,7 +538,7 @@ public class BlueBoardAlternate extends LinearOpMode {
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger1(){return new HalfwayTrigger1();}
+    public Action halfwayTrigger1_raiseSlidesToAutoLow(){return new HalfwayTrigger1();}
     public class HalfwayTrigger1 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -566,7 +551,7 @@ public class BlueBoardAlternate extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger1b(){return new HalfwayTrigger1b();}
+    public Action halfwayTrigger1b_raiseSlidesToAutoHeight(){return new HalfwayTrigger1b();}
     public class HalfwayTrigger1b implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -579,7 +564,7 @@ public class BlueBoardAlternate extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger2(){return new HalfwayTrigger2();}
+    public Action halfwayTrigger2_moveArmToBoardDeliverPos(){return new HalfwayTrigger2();}
     public class HalfwayTrigger2 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -592,7 +577,7 @@ public class BlueBoardAlternate extends LinearOpMode {
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action halfwayTrigger3(){return new HalfwayTrigger3();}
+    public Action halfwayTrigger3_moveWristToBoardDeliverPos(){return new HalfwayTrigger3();}
     public class HalfwayTrigger3 implements Action{
         public boolean run(@NonNull TelemetryPacket packet) {
             boolean moveArm = false;
@@ -637,74 +622,77 @@ public class BlueBoardAlternate extends LinearOpMode {
             return false;
         }
     }
-        public Action armRotationsPurplePixelDelivery() {
-            return new ArmRotationsPurplePixelDelivery();
-        }
 
-        public class ArmRotationsPurplePixelDelivery implements Action {
-            private boolean initialized = false;
+    public Action armRotationsPurplePixelDelivery() {
+        return new ArmRotationsPurplePixelDelivery();
+    }
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    control.ArmRotationsPurplePixelDelivery();
-                    initialized = true;
-                }
-                packet.put("Rotate Arm to deliver purple pixel on line", 0);
-                return false;
+    public class ArmRotationsPurplePixelDelivery implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ArmRotationsPurplePixelDelivery();
+                initialized = true;
             }
+            packet.put("Rotate Arm to deliver purple pixel on line", 0);
+            return false;
         }
-        public Action wristRotationsPurplePixelDelivery() {
-            return new WristRotationsPurplePixelDelivery();
-        }
+    }
+    public Action wristRotationsPurplePixelDelivery() {
+        return new WristRotationsPurplePixelDelivery();
+    }
 
-        public class WristRotationsPurplePixelDelivery implements Action {
-            private boolean initialized = false;
+    public class WristRotationsPurplePixelDelivery implements Action {
+        private boolean initialized = false;
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    control.WristRotationsPurplePixelDelivery();
-                    initialized = true;
-                }
-                packet.put("Adjust wrist to deliver the purple pixel on line", 0);
-                return false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.WristRotationsPurplePixelDelivery();
+                initialized = true;
             }
+            packet.put("Adjust wrist to deliver the purple pixel on line", 0);
+            return false;
         }
-        public Action releasePurplePixel() {
-            return new ReleasePurplePixel();
-        }
+    }
 
-        public class ReleasePurplePixel implements Action {
-            private boolean initialized = false;
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    control.ReleasePurplePixel();
-                    initialized = true;
-                }
-                packet.put("Release purple pixel on line", 0);
-                return false;
+    public Action releasePurplePixel() {
+        return new ReleasePurplePixel();
+    }
+
+    public class ReleasePurplePixel implements Action {
+        private boolean initialized = false;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ReleasePurplePixel();
+                initialized = true;
             }
+            packet.put("Release purple pixel on line", 0);
+            return false;
         }
+    }
 
-        public Action clearanceAfterPurpleDelivery() {
-            return new ClearanceAfterPurpleDelivery();
-        }
+    public Action clearanceAfterPurpleDelivery() {
+        return new ClearanceAfterPurpleDelivery();
+    }
 
-        public class ClearanceAfterPurpleDelivery implements Action {
-            private boolean initialized = false;
+    public class ClearanceAfterPurpleDelivery implements Action {
+        private boolean initialized = false;
 
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    control.ClearanceAfterPurpleDelivery();
-                    initialized = true;
-                }
-                packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
-                return false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.ClearanceAfterPurpleDelivery();
+                initialized = true;
             }
+            packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
+            return false;
         }
+    }
 }
 
