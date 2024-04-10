@@ -103,7 +103,7 @@ public class ManualWithUniversalClass extends LinearOpMode {
                 // Slides LOW
                 if (gamepad2.a && !gamepad2.start) {
                     theRobot.ServoStop();
-                    theRobot.SlidesLow();
+                    theRobot.SlidesToAuto();
                     theRobot.SpecialSleep(500);
                     theRobot.DeliverPixelToBoardPos();
                 }

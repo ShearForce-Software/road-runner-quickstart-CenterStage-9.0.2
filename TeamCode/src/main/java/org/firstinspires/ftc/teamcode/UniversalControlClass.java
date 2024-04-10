@@ -446,6 +446,13 @@ public class  UniversalControlClass {
         GrabPixelPos();
         GrabPixels();
     }
+    public void AutoPickupRoutineStopAndLowerOnly(){
+        // stop the spinners
+        ServoStop();
+        // Move arm and wrist down to grab the pixels
+        GrabPixelPos();
+        //GrabPixels();
+    }
     public void AutoPickupRoutineGrabAndUp(){
         // Turn spinners back on the other way, in case a pixel is in a bad spot
         // make a slight move of the arm to prevent the pixels getting hit on the sensors when the slides start going up has a (150ms sleep)

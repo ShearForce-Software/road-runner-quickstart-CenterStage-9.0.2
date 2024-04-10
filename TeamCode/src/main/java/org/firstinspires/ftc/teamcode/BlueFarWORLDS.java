@@ -35,7 +35,7 @@ public class BlueFarWORLDS extends LinearOpMode {
     public static VelConstraint slowDownVelocityConstraint;
     public static AccelConstraint slowDownAccelerationConstraint;
     double stackY = 12.0;
-    double stackX = -57.0;
+    double stackX = -58;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
@@ -67,10 +67,10 @@ public class BlueFarWORLDS extends LinearOpMode {
 
         // Create the floor to Stack trajectory
         DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                .splineToLinearHeading(new Pose2d(-54, stackY, Math.toRadians(180)), Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(stackX+5, stackY, Math.toRadians(180)), Math.toRadians(180), null, slowDownAccelerationConstraint)
                 .strafeToLinearHeading(new Vector2d(stackPose.position.x, stackY), Math.toRadians(180))
                 //.lineToX(-59, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         // ***************************************************
@@ -107,7 +107,7 @@ public class BlueFarWORLDS extends LinearOpMode {
 
 
         /* Pick up a White Pixel from the stack */
-        control.AutoPickupRoutineDrive(1.5);
+        control.AutoPickupRoutineDrive(2.2);
         drive.updatePoseEstimate();
 
         /* Drive to the board while moving arm up to scoring position after crossing the half-way point */
@@ -115,13 +115,19 @@ public class BlueFarWORLDS extends LinearOpMode {
         Actions.runBlocking(new SequentialAction(
                 autoGrab1(),
                 new SleepAction(.25),
+                autograb(),
+                new SleepAction(.25),
                 new ParallelAction(
                         new SequentialAction(
-                                autoGrab2(),
-                                new SleepAction(.15),
+                                pickUpWhitePixels(),
+                                new SleepAction(.3),
                                 servoOuttake()
                         ),
-                        BoardTraj2,
+
+                        new SequentialAction(
+                                new SleepAction(.15),
+                                BoardTraj2
+                        ),
                         new SequentialAction(
                                 halfwayTrigger1(),
                                 new SleepAction(.15),
@@ -134,7 +140,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrectionFancy();
+        control.TagCorrection();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -149,7 +155,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
             drive.actionBuilder(drive.pose)
-                .lineToX(46)
+                .lineToX(drive.pose.position.x-1.5)
                 .build());
 
         // **********************************************************
@@ -166,8 +172,8 @@ public class BlueFarWORLDS extends LinearOpMode {
                 .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-36, stackY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-52, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(stackX+5, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                 .build();
 
         drive.useExtraCorrectionLogic = true;
@@ -190,7 +196,7 @@ public class BlueFarWORLDS extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(stackX,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180), slowDownVelocityConstraint)
                         .build()
         );
         drive.updatePoseEstimate();
@@ -223,13 +229,18 @@ public class BlueFarWORLDS extends LinearOpMode {
         Actions.runBlocking(new SequentialAction(
                         autoGrab1(),
                         new SleepAction(.25),
+                        autograb(),
+                        new SleepAction(.25),
                         new ParallelAction(
                                 new SequentialAction(
-                                        autoGrab2(),
-                                        new SleepAction(.15),
+                                        pickUpWhitePixels(),
+                                        new SleepAction(.3),
                                         servoOuttake()
                                         ),
-                                BoardTraj2,
+                                new SequentialAction(
+                                        new SleepAction(.15),
+                                        BoardTraj2
+                                ),
                                 new SequentialAction(
                                         halfwayTrigger1(),
                                         new SleepAction(.15),
@@ -388,20 +399,33 @@ public class BlueFarWORLDS extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.AutoPickupRoutineStopAndLower();
+                control.AutoPickupRoutineStopAndLowerOnly();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
             return false;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
-    public Action autoGrab2(){return new AutoGrab2();}
+    public Action pickUpWhitePixels(){return new AutoGrab2();}
     public class AutoGrab2 implements Action{
         private boolean initialized = false;
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
                 control.AutoPickupRoutineGrabAndUp();
+                initialized = true;
+            }
+            packet.put("servoIntake", 0);
+            return false;  // returning true means not done, and will be called again.  False means action is completely done
+        }
+    }
+    public Action autograb(){return new Grab();}
+    public class Grab implements Action{
+        private boolean initialized = false;
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            if (!initialized) {
+                control.GrabPixels();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
