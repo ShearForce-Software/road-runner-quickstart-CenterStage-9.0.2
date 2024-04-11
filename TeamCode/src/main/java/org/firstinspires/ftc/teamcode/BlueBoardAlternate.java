@@ -54,6 +54,7 @@ public class BlueBoardAlternate extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
+        control.HuskyLensInit2();
         //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
