@@ -54,7 +54,7 @@ public class MeepMeep_BlueFarWORLDS {
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 1;
+        autoPosition = 2;
 
         // Build up the floor delivery trajectory
         BlueRightPurplePixelDecision();
@@ -170,17 +170,18 @@ public class MeepMeep_BlueFarWORLDS {
         if (autoPosition == 1) {
             deliverToFloorPose = new Pose2d(-37, 31, Math.toRadians(180));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
-                    .strafeToLinearHeading(new Vector2d(-31, 34), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
+                    //.splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
+                    //.strafeToLinearHeading(new Vector2d(-31, 34), Math.toRadians(180))
+                    //.strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(180))
+                    .splineToLinearHeading(new Pose2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y, Math.toRadians(180)), Math.toRadians(0), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .build();
         }
         //***POSITION 3***
         else if (autoPosition == 3) {
             deliverToFloorPose = new Pose2d(-37.5, 22.5, Math.toRadians(315));
             FloorTraj = myBot.getDrive().actionBuilder(startPose)
-                    .splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
-                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(315))
+                    //.splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
+                    .splineToLinearHeading (deliverToFloorPose, Math.toRadians(315), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .build();
         }
         //***POSITION 2***

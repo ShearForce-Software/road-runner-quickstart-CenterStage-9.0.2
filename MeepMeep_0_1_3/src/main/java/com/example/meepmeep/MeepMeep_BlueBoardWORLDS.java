@@ -54,7 +54,7 @@ public class MeepMeep_BlueBoardWORLDS {
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 2;
+        autoPosition = 3;
 
         // Build up the start to board delivery trajectory
         BlueBoardDecision();
@@ -154,29 +154,29 @@ public class MeepMeep_BlueBoardWORLDS {
             deliverToBoardPose = new Pose2d(46,36,Math.toRadians(180));
         }
         BoardTraj2 = myBot.getDrive().actionBuilder(startPose)
-                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0), speedUpVelocityConstraint)
                 .build();
     }
     static public void BlueBoardPurplePixelDecision() {
         if (autoPosition == 1) {
             deliverToFloorPose = new Pose2d(10.5, 30, Math.toRadians(180));
             FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                    .setTangent(Math.toRadians(180))
+                    //.setTangent(Math.toRadians(180))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
         else if (autoPosition == 3) {
             deliverToFloorPose = new Pose2d(12, 30, Math.toRadians(0));
             FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(12, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
+                    .splineToLinearHeading(new Pose2d(12, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .build();
         }
         else {
             deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(90));
             FloorTraj = myBot.getDrive().actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(12, 36, Math.toRadians(90)), Math.toRadians(180))
-                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(90))
+                    //.splineToLinearHeading(new Pose2d(12, 36, Math.toRadians(90)), Math.toRadians(180))
+                    .splineToLinearHeading(deliverToFloorPose, Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .build();
         }
     }
