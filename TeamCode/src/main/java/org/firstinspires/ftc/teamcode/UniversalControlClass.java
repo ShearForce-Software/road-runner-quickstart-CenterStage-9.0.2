@@ -434,7 +434,15 @@ public class  UniversalControlClass {
                 }
             }
             else{
-                moveRobot(.65, 0, 0);
+                //moveRobot(.65, 0, 0);
+                if (forward) {
+                    moveRobot(-.75, 0, 0);
+                    forward = false;
+                }
+                else{
+                    moveRobot(.75, 0, 0);
+                    forward = true;
+                }
             }
             opMode.sleep(100);
         }
