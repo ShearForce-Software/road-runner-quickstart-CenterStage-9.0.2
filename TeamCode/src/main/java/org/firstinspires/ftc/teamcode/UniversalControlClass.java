@@ -86,7 +86,7 @@ public class  UniversalControlClass {
     public static final double SLIDE_POWER   = 0.75;
     public static final int SLIDE_MAX_HEIGHT = -2850;
     public static final int SLIDE_MIN_HEIGHT = 0;
-    public static final int SLIDE_AUTO_HEIGHT = -450;
+    public static final int SLIDE_AUTO_HEIGHT = -500;
     public static final int SLIDE_LOW_HEIGHT = -1000;
     public static final int SLIDE_MEDIUM_HEIGHT = -1500;
     public double wristPosition = 0.0;
@@ -735,7 +735,7 @@ public class  UniversalControlClass {
         }
     }
     public void StopNearBoardAuto(boolean releaseBoth){
-        double timeout = opMode.getRuntime() + 3;
+        double timeout = opMode.getRuntime() + .75;
         while((clawDistanceSensor.getDistance(DistanceUnit.MM) > 50) && (opMode.getRuntime() < timeout)){
             moveRobot(-.55,0.0,0);
             ShowSlideTelemetry();

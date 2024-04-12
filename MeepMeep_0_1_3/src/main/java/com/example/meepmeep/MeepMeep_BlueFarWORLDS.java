@@ -54,7 +54,7 @@ public class MeepMeep_BlueFarWORLDS {
         // ******************************************
         /* Specify which Position will be run */
         // ******************************************
-        autoPosition = 2;
+        autoPosition = 1;
 
         // Build up the floor delivery trajectory
         BlueRightPurplePixelDecision();

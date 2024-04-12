@@ -35,7 +35,7 @@ public class BlueFarWORLDS extends LinearOpMode {
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
     double stackY = 12.0;
-    double stackX = -58;
+    double stackX = -59;
 
     public void runOpMode(){
         startPose = new Pose2d(-36,62.5,Math.toRadians(270));
@@ -66,11 +66,20 @@ public class BlueFarWORLDS extends LinearOpMode {
         control.autoTimeLeft = 0.0;
 
         // Create the floor to Stack trajectory
-        DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                .splineToLinearHeading(new Pose2d(stackX+5, stackY, Math.toRadians(180)), Math.toRadians(180), null, slowDownAccelerationConstraint)
-                .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
-                .build();
+        if(control.autoPosition==1) {
+            DriveToStack = drive.actionBuilder(deliverToFloorPose)
+                    .strafeToLinearHeading(new Vector2d(stackX + 5, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX - 2, stackY), Math.toRadians(180), slowDownVelocityConstraint, slowDownAccelerationConstraint)
+                    .build();
+        }
+        else{
+            DriveToStack = drive.actionBuilder(deliverToFloorPose)
+                    .splineToLinearHeading(new Pose2d(stackX+5, stackY, Math.toRadians(180)), Math.toRadians(180), null, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint, slowDownAccelerationConstraint)
+                    .build();
+        }
 
         // ***************************************************
         // ****  START DRIVING    ****************************
@@ -264,15 +273,15 @@ public class BlueFarWORLDS extends LinearOpMode {
     public void BlueBoardDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(46,42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,39,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(46,30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,27,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(46,36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,33,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)

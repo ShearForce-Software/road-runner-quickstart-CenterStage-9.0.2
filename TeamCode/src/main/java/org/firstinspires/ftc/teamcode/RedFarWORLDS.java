@@ -91,7 +91,7 @@ public class RedFarWORLDS extends LinearOpMode {
                         /* Deliver the Purple Pixel */
                         new SequentialAction(
                                 releasePurplePixel(),
-                                new SleepAction(.15),
+                                new SleepAction(.2),
                                 clearanceAfterPurpleDelivery()
                         ),
                         /* Drive to the stack of white pixels */
