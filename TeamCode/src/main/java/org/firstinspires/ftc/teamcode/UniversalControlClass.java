@@ -499,6 +499,11 @@ public class  UniversalControlClass {
         ReadyToLiftSlides();
         AutoIntake = false;
     }
+    public void setBlinken_to5Volt()
+    {
+        blinkinLedDriverLeft.setPattern(RevBlinkinLedDriver.BlinkinPattern.fromNumber(1625));
+        blinkinLedDriverRight.setPattern(RevBlinkinLedDriver.BlinkinPattern.fromNumber(1625));
+    }
     public void EnableAutoIntake(){
         AutoIntake = true;
     }
@@ -508,6 +513,17 @@ public class  UniversalControlClass {
     public void InitBlinkin(HardwareMap hardwareMap) {
         blinkinLedDriverLeft = hardwareMap.get(RevBlinkinLedDriver.class,"leftBlinkin");
         blinkinLedDriverRight = hardwareMap.get(RevBlinkinLedDriver.class,"rightBlinkin");
+
+        /*
+        Servo fakeBlinkinLeft = hardwareMap.get(Servo.class, "leftBlinkin");
+        Servo fakeBlinkinRight = hardwareMap.get(Servo.class, "rightBlinkin");
+        fakeBlinkinLeft.getController().setServoPosition(fakeBlinkinLeft.getPortNumber(), 2125);
+        fakeBlinkinRight.getController().setServoPosition(fakeBlinkinRight.getPortNumber(), 2125);
+        opMode.sleep(100);
+        */
+
+
+        //setBlinken_to5Volt();
         //leftColorSensor = hardwareMap.get(RevColorSensorV3.class, "ColorSensorLeft");
 
         if(allianceColorIsBlue){
@@ -1092,6 +1108,25 @@ public class  UniversalControlClass {
             }
             opMode.telemetry.addData("Auto position: ", autoPosition);
         }
+        else if(blocks.length > 1){
+            int xVal = blocks[1].x;
+            opMode.telemetry.addData("Team Art Detected: ", true);
+            opMode.telemetry.addData("Team Art X position: ", xVal);
+            if (xVal <= leftSpikeBound){
+                autoPosition = 3;
+                DESIRED_TAG_ID = 3;
+            }
+            else if ((xVal > leftSpikeBound) && (xVal < rightSpikeBound)){
+                autoPosition = 2;
+                DESIRED_TAG_ID = 2;
+            }
+            else if (xVal >= rightSpikeBound)
+            {
+                autoPosition = 1;
+                DESIRED_TAG_ID = 1;
+            }
+            opMode.telemetry.addData("Auto position: ", autoPosition);
+        }
         else{
             //pick a spot
             opMode.telemetry.addData("!!Team Art NOT DETECTED!! ", "DEFAULT TO POSITION 1");
@@ -1115,6 +1150,25 @@ public class  UniversalControlClass {
         HuskyLens.Block[] blocks = huskyLens.blocks();
         if (blocks.length > 0){
             int xVal = blocks[0].x;
+            opMode.telemetry.addData("Team Art Detected: ", true);
+            opMode.telemetry.addData("Team Art X position: ", xVal);
+            if (xVal <= leftSpikeBound){
+                autoPosition = 3;
+                DESIRED_TAG_ID = 3;
+            }
+            else if ((xVal > leftSpikeBound) && (xVal < rightSpikeBound)){
+                autoPosition = 2;
+                DESIRED_TAG_ID = 2;
+            }
+            else if (xVal >= rightSpikeBound)
+            {
+                autoPosition = 1;
+                DESIRED_TAG_ID = 1;
+            }
+            opMode.telemetry.addData("Auto position: ", autoPosition);
+        }
+        else if(blocks.length > 1){
+            int xVal = blocks[1].x;
             opMode.telemetry.addData("Team Art Detected: ", true);
             opMode.telemetry.addData("Team Art X position: ", xVal);
             if (xVal <= leftSpikeBound){
@@ -1172,6 +1226,25 @@ public class  UniversalControlClass {
             }
             opMode.telemetry.addData("Auto position: ", autoPosition);
         }
+        else if(blocks.length > 1){
+            int xVal = blocks[0].x;
+            opMode.telemetry.addData("Team Art Detected: ", true);
+            opMode.telemetry.addData("Team Art X position: ", xVal);
+            if (xVal <= leftSpikeBound){
+                autoPosition = 3;
+                DESIRED_TAG_ID = 6;
+            }
+            else if ((xVal > leftSpikeBound) && (xVal < rightSpikeBound)){
+                autoPosition = 2;
+                DESIRED_TAG_ID = 5;
+            }
+            else if (xVal >= rightSpikeBound)
+            {
+                autoPosition = 1;
+                DESIRED_TAG_ID = 4;
+            }
+            opMode.telemetry.addData("Auto position: ", autoPosition);
+        }
         else{
             //pick a spot
             opMode.telemetry.addData("!!Team Art NOT DETECTED!! ", "DEFAULT TO RIGHT");
@@ -1194,6 +1267,25 @@ public class  UniversalControlClass {
         }
         HuskyLens.Block[] blocks = huskyLens.blocks();
         if (blocks.length > 0){
+            int xVal = blocks[0].x;
+            opMode.telemetry.addData("Team Art Detected: ", true);
+            opMode.telemetry.addData("Team Art X position: ", xVal);
+            if (xVal <= leftSpikeBound){
+                autoPosition = 3;
+                DESIRED_TAG_ID = 6;
+            }
+            else if ((xVal > leftSpikeBound) && (xVal < rightSpikeBound)){
+                autoPosition = 2;
+                DESIRED_TAG_ID = 5;
+            }
+            else if (xVal >= rightSpikeBound)
+            {
+                autoPosition = 1;
+                DESIRED_TAG_ID = 4;
+            }
+            opMode.telemetry.addData("Auto position: ", autoPosition);
+        }
+        else if(blocks.length > 1){
             int xVal = blocks[0].x;
             opMode.telemetry.addData("Team Art Detected: ", true);
             opMode.telemetry.addData("Team Art X position: ", xVal);
