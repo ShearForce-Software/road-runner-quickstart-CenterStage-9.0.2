@@ -162,7 +162,7 @@ public class RedBoardAlternate extends LinearOpMode {
                         ),
                         new SequentialAction(
                                 releasePurplePixel(),
-                                new SleepAction(.15),
+                                new SleepAction(.2),
                                 clearanceAfterPurpleDelivery()
                         ),
                         new ParallelAction(

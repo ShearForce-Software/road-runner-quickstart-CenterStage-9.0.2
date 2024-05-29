@@ -34,7 +34,7 @@ public class RedFarWORLDS extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    double stackY = -12.0;
+    double stackY = -11.5;
     double stackX = -59.0;
 
     public void runOpMode(){

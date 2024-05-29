@@ -172,6 +172,7 @@ public class RedBoardWORLDS extends LinearOpMode {
 
         //intake 2 more white pixels
         control.AutoPickupRoutineDrive(2.2);
+        //sleep(1000);
         drive.updatePoseEstimate();
 
         // Build up the Stack to Board Position 3 Trajectory

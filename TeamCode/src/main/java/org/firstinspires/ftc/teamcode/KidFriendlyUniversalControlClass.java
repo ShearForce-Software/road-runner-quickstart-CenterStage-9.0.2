@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode;
+
 import static org.firstinspires.ftc.teamcode.MecanumDrive.PARAMS;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.dfrobot.HuskyLens;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.hardware.rev.RevColorSensorV3;
@@ -9,15 +11,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.Range;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.SequentialAction;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -30,8 +28,9 @@ import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 @Config
-public class  UniversalControlClass {
+public class KidFriendlyUniversalControlClass {
     LinearOpMode opMode;
     DcMotor leftFront;
     DcMotor leftRear;
@@ -83,8 +82,8 @@ public class  UniversalControlClass {
     public static double dropPosition = 0;
     private TfodProcessor tfod;
     boolean AutoIntake = false;
-    public static final double SLIDE_POWER   = 0.75;
-    public static final int SLIDE_MAX_HEIGHT = -2850;
+    public static final double SLIDE_POWER   = 0.75 *.3;
+    public static final int SLIDE_MAX_HEIGHT = -1500;
     public static final int SLIDE_MIN_HEIGHT = 0;
     public static final int SLIDE_AUTO_HEIGHT = -500;
     public static final int SLIDE_LOW_HEIGHT = -1000;
@@ -122,7 +121,7 @@ public class  UniversalControlClass {
     public static boolean allianceColorIsBlue = false;
     public static double autoTimeLeft = 0.0;
 
-    public UniversalControlClass(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
+    public KidFriendlyUniversalControlClass(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
         this.IsFieldCentric = isFieldCentric;
         this.opMode = opMode;
@@ -412,6 +411,7 @@ public class  UniversalControlClass {
                 SetBlinkinToPixelColor();
                 ServoOuttake();
                 ReadyToLiftSlides();
+                SpecialSleep(3000);
                 AutoIntake = false;
             }
         }
@@ -606,6 +606,7 @@ public class  UniversalControlClass {
         intakeLeft.setPower(0);
         intakeRight.setPower(0);
     }
+    // Add 3 second delay to account for the
     public void SlidesLow(){
         leftSlide.setTargetPosition(SLIDE_LOW_HEIGHT);
         rightSlide.setTargetPosition(SLIDE_LOW_HEIGHT);
@@ -621,6 +622,7 @@ public class  UniversalControlClass {
         SetSlidePower(SLIDE_POWER);
     }
     public void SlidesHigh(){
+
         leftSlide.setTargetPosition(SLIDE_MAX_HEIGHT);
         rightSlide.setTargetPosition(SLIDE_MAX_HEIGHT);
         leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -1379,10 +1381,10 @@ public class  UniversalControlClass {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        leftFront.setPower(frontLeftPower*1.0);
-        leftRear.setPower(backLeftPower*1.0);
-        rightFront.setPower(frontRightPower*1.0);
-        rightRear.setPower(backRightPower*1.0);
+        leftFront.setPower(frontLeftPower*.3);
+        leftRear.setPower(backLeftPower*.3);
+        rightFront.setPower(frontRightPower*.3);
+        rightRear.setPower(backRightPower*.3);
     }
     public void RunDriveControls() {
         if (IsFieldCentric) {
