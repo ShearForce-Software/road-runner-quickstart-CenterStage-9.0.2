@@ -131,64 +131,15 @@ public class SummerChassis {
         leftRear = hardwareMap.get(DcMotor.class, "leftRear");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
         rightRear = hardwareMap.get(DcMotor.class, "rightRear");
-        intakeLeft = hardwareMap.get(CRServo.class, "intakeLeft");
-        intakeRight = hardwareMap.get(CRServo.class, "intakeRight");
-        grabberLeft = hardwareMap.get(Servo.class, "pixelGrabberLeft");
-        grabberRight = hardwareMap.get(Servo.class, "pixelGrabberRight");
-        armRotLeft = hardwareMap.get(Servo.class, "armRotateLeft");
-        armRotRight = hardwareMap.get(Servo.class, "armRotateRight");
-        wristLeft = hardwareMap.get(Servo.class, "pixelRotateLeft");
-        wristRight = hardwareMap.get(Servo.class, "pixelRotateRight");
-        droneLauncher = hardwareMap.get(Servo.class, "droneLaunch");
-        rightSlide = hardwareMap.get(DcMotor.class, "rightSlide");
-        leftSlide = hardwareMap.get(DcMotor.class, "leftSlide");
-        leftSlideLimit = hardwareMap.get(TouchSensor.class, "leftSlideLimit");
-        rightSlideLimit = hardwareMap.get(TouchSensor.class, "rightSlideLimit");
-
-        leftScissor = hardwareMap.get(DcMotor.class, "centerOdometry");
-        rightScissor = hardwareMap.get(DcMotor.class, "rightScissor");
-        leftScissor.setDirection(DcMotorSimple.Direction.FORWARD);
-        leftScissor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightScissor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftScissor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightScissor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-
-        leftColorSensor = hardwareMap.get(RevColorSensorV3.class, "ColorSensorLeft");
-        rightColorSensor = hardwareMap.get(RevColorSensorV3.class, "ColorSensorRight");
-        clawDistanceSensor = hardwareMap.get(RevColorSensorV3.class, "ClawSensor");
-        InitBlinkin(hardwareMap);
-        leftColorSensor.enableLed(false);
-        rightColorSensor.enableLed(false);
-        huskyLens = hardwareMap.get(HuskyLens.class, "huskyLens1");
-        huskyLens2 = hardwareMap.get(HuskyLens.class, "huskyLens2");
 
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
-        armRotLeft.setDirection(Servo.Direction.FORWARD);  // Updated for Axon: To FORWARD
-        armRotRight.setDirection(Servo.Direction.REVERSE); // Updated for Axon: To REVERSE
-        wristLeft.setDirection(Servo.Direction.REVERSE);
-        wristRight.setDirection(Servo.Direction.FORWARD);
-        grabberLeft.setDirection(Servo.Direction.REVERSE);
-        grabberRight.setDirection(Servo.Direction.FORWARD);
-        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-
-        leftSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightSlide.setDirection(DcMotor.Direction.FORWARD);
-        leftSlide.setDirection(DcMotor.Direction.REVERSE);
-        intakeRight.setDirection(DcMotorSimple.Direction.REVERSE);
-        intakeLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
                 PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
         imu.initialize(parameters);
         imu.resetYaw();
-        droneLauncher.setPosition(.1);
     }
 
     public void WebcamInit (HardwareMap hardwareMap){
