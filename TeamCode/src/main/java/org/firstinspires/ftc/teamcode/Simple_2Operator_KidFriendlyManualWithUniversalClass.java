@@ -5,13 +5,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.KidFriendlyUniversalControlClass;
-
-@Disabled
-@TeleOp(name = "Kid Friendly Control")
-public class KidFriendlyManualWithUniversalClass extends LinearOpMode {
+//@Disabled
+@TeleOp(name = "Kid Friendly Control - 2 Operator")
+public class Simple_2Operator_KidFriendlyManualWithUniversalClass extends LinearOpMode {
     KidFriendlyUniversalControlClass theRobot;
     static final double SCALE = 0.001;
+
     public void runOpMode() {
         theRobot = new KidFriendlyUniversalControlClass(true, true, this);
 
@@ -19,7 +18,7 @@ public class KidFriendlyManualWithUniversalClass extends LinearOpMode {
         double armRotationRightPosition = 0.07;
         final double MAX_POS     =  1.0;     // Maximum rotational position
         final double MIN_POS     =  0.0;     // Minimum rotational position
-        final double MIN_POS_ARM     =  0.04;     // Minimum rotational position
+        final double MIN_POS_ARM     =  0.03; //0.04;     // Minimum rotational position
 
         theRobot.Init(this.hardwareMap);
         theRobot.ManualStartPos();
@@ -57,9 +56,9 @@ public class KidFriendlyManualWithUniversalClass extends LinearOpMode {
                 if(gamepad1.y){
                     theRobot.imu.resetYaw();
                 }
-                if (gamepad1.left_trigger != 0) {
+                if (gamepad1.left_trigger != 0 && gamepad1.x) {
                     theRobot.SetScissorLiftPower(gamepad1.left_trigger);
-                } else if (gamepad1.right_trigger != 0) {
+                } else if (gamepad1.right_trigger != 0 && gamepad1.x) {
                     theRobot.SetScissorLiftPower(-gamepad1.right_trigger);
                 } else {
                     theRobot.SetScissorLiftPower(0);
@@ -72,9 +71,11 @@ public class KidFriendlyManualWithUniversalClass extends LinearOpMode {
                  *************************************************
                  *************************************************
                  */
+
                 if (gamepad2.right_bumper) { // intake in
                     theRobot.EnableAutoIntake();
                 }
+
                 if (gamepad2.dpad_right) {
                     theRobot.ServoStop();
                     theRobot.DisableAutoIntake();
@@ -117,37 +118,42 @@ public class KidFriendlyManualWithUniversalClass extends LinearOpMode {
                 if (gamepad2.b && !gamepad2.start) {
                     theRobot.ResetArm();
                 }
-                // Manual incremental control of the wrist
-                if (gamepad2.right_stick_x > 0.1)
-                {
-                    theRobot.ArmWrist(theRobot.getWristPosition() + 0.01);
-                    theRobot.SpecialSleep(150);
-                }
-                else if (gamepad2.right_stick_x < -0.1)
-                {
-                    theRobot.ArmWrist(theRobot.getWristPosition() - 0.01);
-                    theRobot.SpecialSleep(150);
-                }
-                // Manual incremental control to rotate the arm servo
-                if (gamepad2.left_stick_y != 0) {
-                    armRotationLeftPosition += -gamepad2.left_stick_y * SCALE;
-                    armRotationRightPosition += -gamepad2.left_stick_y * SCALE;
-                    if (armRotationLeftPosition >= MAX_POS) {
-                        armRotationLeftPosition = MAX_POS;
-                    }
-                    if (armRotationLeftPosition <= MIN_POS_ARM) {
 
-                        armRotationLeftPosition = MIN_POS_ARM;
-                    }
-                    if (armRotationRightPosition >= MAX_POS) {
-                        armRotationRightPosition = MAX_POS;
-                    }
-                    if (armRotationRightPosition <= MIN_POS_ARM) {
-                        armRotationRightPosition = MIN_POS_ARM;
-                    }
-                    theRobot.armRotLeft.setPosition(armRotationLeftPosition);
-                    theRobot.armRotRight.setPosition(armRotationRightPosition);
-                }
+                // Manual increment disabled for Demo
+                //**********************************************************
+                // Manual incremental control of the wrist
+//                if (gamepad2.right_stick_x > 0.1)
+//                {
+//                    theRobot.ArmWrist(theRobot.getWristPosition() + 0.01);
+//                    theRobot.SpecialSleep(150);
+//                }
+//                else if (gamepad2.right_stick_x < -0.1)
+//                {
+//                    theRobot.ArmWrist(theRobot.getWristPosition() - 0.01);
+//                    theRobot.SpecialSleep(150);
+//                }
+//                // Manual incremental control to rotate the arm servo
+//                if (gamepad2.left_stick_y != 0) {
+//                    armRotationLeftPosition += -gamepad2.left_stick_y * SCALE;
+//                    armRotationRightPosition += -gamepad2.left_stick_y * SCALE;
+//                    if (armRotationLeftPosition >= MAX_POS) {
+//                        armRotationLeftPosition = MAX_POS;
+//                    }
+//                    if (armRotationLeftPosition <= MIN_POS_ARM) {
+//
+//                        armRotationLeftPosition = MIN_POS_ARM;
+//                    }
+//                    if (armRotationRightPosition >= MAX_POS) {
+//                        armRotationRightPosition = MAX_POS;
+//                    }
+//                    if (armRotationRightPosition <= MIN_POS_ARM) {
+//                        armRotationRightPosition = MIN_POS_ARM;
+//                    }
+//                    theRobot.armRotLeft.setPosition(armRotationLeftPosition);
+//                    theRobot.armRotRight.setPosition(armRotationRightPosition);
+//                }
+                //*************************************************************
+
                 // Manual control of the slides
                 if (gamepad2.dpad_up)
                 {
@@ -163,11 +169,11 @@ public class KidFriendlyManualWithUniversalClass extends LinearOpMode {
                     // slowly lower the slides
                     theRobot.SlidesDown();
                 }
-                // special combo (left tiny button and top right button together)
-                if (gamepad2.back && gamepad2.y) {
-                    theRobot.ResetWristGrabPixelPos();
-                    theRobot.SpecialSleep(150);
-                }
+//                // special combo (left tiny button and top right button together)
+//                if (gamepad2.back && gamepad2.y) {
+//                    theRobot.ResetWristGrabPixelPos();
+//                    theRobot.SpecialSleep(150);
+//                }
 
                 theRobot.ShowSlideTelemetry();
                 telemetry.update();

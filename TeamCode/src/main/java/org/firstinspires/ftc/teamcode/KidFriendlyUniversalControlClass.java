@@ -83,19 +83,19 @@ public class KidFriendlyUniversalControlClass {
     private TfodProcessor tfod;
     boolean AutoIntake = false;
     public static final double SLIDE_POWER   = 0.75 *.3;
-    public static final int SLIDE_MAX_HEIGHT = -1500;
+    public static final int SLIDE_MAX_HEIGHT = -1800;
     public static final int SLIDE_MIN_HEIGHT = 0;
     public static final int SLIDE_AUTO_HEIGHT = -500;
     public static final int SLIDE_LOW_HEIGHT = -1000;
-    public static final int SLIDE_MEDIUM_HEIGHT = -1500;
+    public static final int SLIDE_MEDIUM_HEIGHT = -1150;
     public double wristPosition = 0.0;
-    public double wholeArmPosition = 0.04;
+    public double wholeArmPosition = 0.03; // 0.04;
     static final double MAX_WRIST_POS = 1.0;
     static final double MIN_WRIST_POS = 0.0;
     public double WRIST_GRAB_PIXEL_POS = 0.45;
     public double WRIST_DELIVER_TO_BOARD_POS = 0.85;
     static final double MAX_WHOLE_ARM_POS = 1.0;
-    static final double MIN_WHOLE_ARM_POS = 0.04;
+    static final double MIN_WHOLE_ARM_POS = 0.03; //0.04;
     //NAV TO TAG VARIABLES
     final double DESIRED_DISTANCE = 12.0; //  this is how close the camera should get to the target (inches)
     final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
@@ -327,8 +327,8 @@ public class KidFriendlyUniversalControlClass {
     public void GrabPixelPos(){ // in center of pixels
         wristLeft.setPosition(WRIST_GRAB_PIXEL_POS);
         wristRight.setPosition(WRIST_GRAB_PIXEL_POS);
-        armRotLeft.setPosition(.04);
-        armRotRight.setPosition(.04);
+        armRotLeft.setPosition(.03); //0.04
+        armRotRight.setPosition(.03); //0.04
     }
     public void ReadyToLiftSlides(){ // slight move before lifting slides
         armRotLeft.setPosition(.08);
