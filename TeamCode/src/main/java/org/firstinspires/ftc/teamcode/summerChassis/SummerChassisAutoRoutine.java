@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.summerChassis;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -16,11 +16,14 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.summerChassis.SummerChassis;
+
 //@Disabled
 @Autonomous(name="Summer Chassis Auto", preselectTeleOp = "ManualControlSummerChassis")
 public class SummerChassisAutoRoutine extends LinearOpMode {
     SummerChassis control = new SummerChassis(true, false,this);
-    MecanumDrive drive;
+    MecanumDrive_summerChassis drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
@@ -48,17 +51,12 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
-        drive = new MecanumDrive(hardwareMap, startPose);
+        drive = new MecanumDrive_summerChassis(hardwareMap, startPose);
         control.Init(hardwareMap);
-        control.HuskyLensInit();
-        control.HuskyLensInit2();
-        //control.WebcamInit(hardwareMap);
-        control.AutoStartPos();
         telemetry.update();
         control.imuOffsetInDegrees = 270; // Math.toDegrees(startPose.heading.toDouble());
 
         while(!isStarted()){
-            control.DetectTeamArtBlue();
             telemetry.update();//make decisions
             BlueRightPurplePixelDecision();
         }
@@ -113,7 +111,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         );
 
         /* Intake White Pixel(s) from the stack */
-        control.AutoPickupRoutineDrive(2.2);
         drive.updatePoseEstimate();
 
         /* Drive to the board while moving arm up to scoring position after crossing the half-way point */
@@ -146,15 +143,15 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrection();
+
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y), Math.toRadians(180))
                         .build());
 
         /* release pixels on the board using the distance sensor to know when to stop */
-        control.StopNearBoardAuto(true);
+
 
         /* BACK UP FROM BOARD slightly so that the pixels fall off cleanly */
         drive.updatePoseEstimate();
@@ -193,18 +190,16 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
 
 
         /* Use camera to make a minor adjustment to position if needed */
-        control.StackCorrectionHL();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180), slowDownVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y), Math.toRadians(180), slowDownVelocityConstraint)
                         .build()
         );
         drive.updatePoseEstimate();
 
 
         //grab 2 more white pixels
-        control.AutoPickupRoutineDrive(2.2);
         drive.updatePoseEstimate();
 
         //drive to position 3
@@ -244,7 +239,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         );
 
         //deliver two white pixels
-        control.StopNearBoardAuto(true);
         drive.updatePoseEstimate();
 
         /* Park the Robot, and Reset the Arm and slides */
@@ -325,8 +319,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.GrabPixels();
-                control.ReleaseLeft();
                 initialized = true;
             }
             packet.put("lock purple pixel", 0);
@@ -339,7 +331,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.DropOnLine();
                 initialized = true;
             }
             packet.put("drop purple pixel on line", 0);
@@ -352,7 +343,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ResetArmAuto();
                 initialized = true;
             }
             packet.put("ResetArm", 0);
@@ -368,7 +358,7 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
                 initialized = true;
             }
             packet.put("Slides Down", 0);
-            boolean slidesAllDown = control.SlidesDownInParallel();
+            boolean slidesAllDown = false;
             return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
@@ -380,7 +370,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
             if (!initialized) {
                 // Stop the spinners and
                 // Move arm and wrist down to grab the pixels
-                control.AutoPickupRoutineStopAndLowerOnly();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
@@ -393,7 +382,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.AutoPickupRoutineGrabAndUp();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
@@ -406,7 +394,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.GrabPixels();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
@@ -419,7 +406,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ServoOuttake();
                 initialized = true;
             }
             packet.put("ServoOuttake", 0);
@@ -432,7 +418,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ServoIntake();
                 initialized = true;
             }
             packet.put("servoIntake", 0);
@@ -446,7 +431,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
             //drive.updatePoseEstimate();
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
-                control.SlidesToAuto();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
@@ -459,7 +443,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
             //drive.updatePoseEstimate();
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
-                control.DeliverPixelToBoardPosPart1();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
@@ -472,7 +455,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
             //drive.updatePoseEstimate();
             if (drive.pose.position.x >= 12) {
                 moveArm = true;
-                control.DeliverPixelToBoardPosPart2();
             }
             packet.put("move arm trigger", 0);
             return !moveArm;  // returning true means not done, and will be called again.  False means action is completely done
@@ -484,7 +466,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ServoStop();
                 initialized = true;
             }
             packet.put("drop purple pixel on line", 0);
@@ -502,8 +483,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ArmRotationsPurplePixelDelivery();
-                control.WristRotationsPurplePixelDelivery();
                 initialized = true;
             }
             packet.put("prepare to drop purple pixel on line", 0);
@@ -521,7 +500,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ArmRotationsPurplePixelDelivery();
                 initialized = true;
             }
             packet.put("Rotate Arm to deliver purple pixel on line", 0);
@@ -538,7 +516,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.WristRotationsPurplePixelDelivery();
                 initialized = true;
             }
             packet.put("Adjust wrist to deliver the purple pixel on line", 0);
@@ -557,7 +534,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ReleasePurplePixel();
                 initialized = true;
             }
             packet.put("Release purple pixel on line", 0);
@@ -575,7 +551,6 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
             if (!initialized) {
-                control.ClearanceAfterPurpleDelivery();
                 initialized = true;
             }
             packet.put("Clearance of arm mechanism after purple pixel delivery", 0);
