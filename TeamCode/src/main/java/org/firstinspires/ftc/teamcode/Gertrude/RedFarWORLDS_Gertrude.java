@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Gertrude;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -14,14 +14,16 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Disabled
-@Autonomous(name="Red Far Multiple Cycles Actions", preselectTeleOp = "1 Manual Control")
-public class RedFarMultipleCyclesActions extends LinearOpMode {
-    UniversalControlClass control = new UniversalControlClass(true, false, this);
-    MecanumDrive drive;
+import org.firstinspires.ftc.teamcode.Gertrude.MecanumDrive_Gertrude;
+import org.firstinspires.ftc.teamcode.Gertrude.Gertrude;
+
+//@Disabled
+@Autonomous(name="Red Far WORLDS - Gertrude", preselectTeleOp = "Gertrude Manual Control")
+public class RedFarWORLDS_Gertrude extends LinearOpMode {
+    Gertrude control = new Gertrude(true, false,this);
+    MecanumDrive_Gertrude drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
@@ -35,7 +37,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    double stackY = -12.0;
+    double stackY = -11.5;
     double stackX = -59.0;
 
     public void runOpMode(){
@@ -49,7 +51,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
-        drive = new MecanumDrive(hardwareMap, startPose);
+        drive = new MecanumDrive_Gertrude(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
         control.HuskyLensInit2();
@@ -92,7 +94,7 @@ public class RedFarMultipleCyclesActions extends LinearOpMode {
                         /* Deliver the Purple Pixel */
                         new SequentialAction(
                                 releasePurplePixel(),
-                                new SleepAction(.15),
+                                new SleepAction(.2),
                                 clearanceAfterPurpleDelivery()
                         ),
                         /* Drive to the stack of white pixels */

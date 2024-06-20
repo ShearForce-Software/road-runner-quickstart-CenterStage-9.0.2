@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Gertrude;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -14,14 +14,16 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Disabled
-@Autonomous(name="Red Board Alternate", preselectTeleOp = "1 Manual Control")
-public class RedBoardAlternate extends LinearOpMode {
-    UniversalControlClass control = new UniversalControlClass(true, false,this);
-    MecanumDrive drive;
+import org.firstinspires.ftc.teamcode.Gertrude.MecanumDrive_Gertrude;
+import org.firstinspires.ftc.teamcode.Gertrude.Gertrude;
+
+//@Disabled
+@Autonomous(name="Red Board Alternate Gertrude", preselectTeleOp = "Gertrude Manual Control")
+public class RedBoardAlternate_Gertrude extends LinearOpMode {
+    Gertrude control = new Gertrude(true, false,this);
+    MecanumDrive_Gertrude drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
@@ -53,7 +55,7 @@ public class RedBoardAlternate extends LinearOpMode {
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
-        drive = new MecanumDrive(hardwareMap, startPose);
+        drive = new MecanumDrive_Gertrude(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
         control.HuskyLensInit2();

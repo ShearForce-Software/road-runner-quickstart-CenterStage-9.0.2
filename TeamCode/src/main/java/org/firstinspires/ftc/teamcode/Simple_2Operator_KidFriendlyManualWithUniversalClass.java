@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-//@Disabled
+@Disabled
 @TeleOp(name = "Kid Friendly Control - 2 Operator")
 public class Simple_2Operator_KidFriendlyManualWithUniversalClass extends LinearOpMode {
     KidFriendlyUniversalControlClass theRobot;

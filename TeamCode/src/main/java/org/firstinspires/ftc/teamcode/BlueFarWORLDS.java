@@ -14,9 +14,10 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-//@Disabled
+@Disabled
 @Autonomous(name="Blue Far WORLDS", preselectTeleOp = "1 Manual Control")
 public class BlueFarWORLDS extends LinearOpMode {
     UniversalControlClass control = new UniversalControlClass(true, false,this);

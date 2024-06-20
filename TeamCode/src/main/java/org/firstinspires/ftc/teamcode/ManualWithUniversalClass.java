@@ -1,11 +1,13 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.UniversalControlClass;
 @TeleOp(name = "1 Manual Control")
+@Disabled
 public class ManualWithUniversalClass extends LinearOpMode {
     UniversalControlClass theRobot;
     static final double SCALE = 0.001;

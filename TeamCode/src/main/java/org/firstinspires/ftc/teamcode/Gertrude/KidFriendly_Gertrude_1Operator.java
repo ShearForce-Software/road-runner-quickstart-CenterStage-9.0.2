@@ -1,17 +1,18 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Gertrude;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@Disabled
-@TeleOp(name = "Kid Friendly Control - 1 Operator")
-public class KidFriendlyManualWithUniversalClass_1Operator extends LinearOpMode {
-    KidFriendlyUniversalControlClass theRobot;
+import org.firstinspires.ftc.teamcode.Gertrude.Gertrude_KidFriendly;
+
+//@Disabled
+@TeleOp(name = "Gertrude Kid Friendly - 1 Operator")
+public class KidFriendly_Gertrude_1Operator extends LinearOpMode {
+    Gertrude_KidFriendly theRobot;
     static final double SCALE = 0.001;
     public void runOpMode() {
-        theRobot = new KidFriendlyUniversalControlClass(true, true, this);
+        theRobot = new Gertrude_KidFriendly(true, true, this);
 
         double armRotationLeftPosition = 0.07;
         double armRotationRightPosition = 0.07;

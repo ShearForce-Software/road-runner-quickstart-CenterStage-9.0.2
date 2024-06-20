@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Gertrude;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -14,56 +14,57 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Disabled
-@Autonomous(name="Red Board Alternate", preselectTeleOp = "1 Manual Control")
-public class RedBoardAlternate extends LinearOpMode {
-    UniversalControlClass control = new UniversalControlClass(true, false,this);
-    MecanumDrive drive;
+import org.firstinspires.ftc.teamcode.Gertrude.MecanumDrive_Gertrude;
+import org.firstinspires.ftc.teamcode.Gertrude.Gertrude;
+
+//@Disabled
+@Autonomous(name="Blue Board Alternate Gertrude", preselectTeleOp = "Gertrude Manual Control")
+public class BlueBoardAlternate_Gertrude extends LinearOpMode {
+    Gertrude control = new Gertrude(true, false,this);
+    MecanumDrive_Gertrude drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
     Pose2d stackPose;
     Action FloorTraj;
     Action DriveToStack;
+    Action DriveBackToStack2;
     Action BoardTraj2;
     Action BoardTraj3;
     Action Park;
     Action DriveBackToStack;
-    Action DriveBackToStack2;
-
     VelConstraint speedUpVelocityConstraint;
     AccelConstraint speedUpAccelerationConstraint;
     VelConstraint slowDownVelocityConstraint;
     AccelConstraint slowDownAccelerationConstraint;
-    double stackY = -36.0;
-    double stackX = -58.0;
-	double wallDriveY = -59.0;
+    double stackY = 36;
+    double stackX = -59;
+	double wallDriveY = 58.5;
 
     public void runOpMode(){
-        startPose = new Pose2d(12,-62.5,Math.toRadians(90));
+        startPose = new Pose2d(12,62.5,Math.toRadians(270));
         stackPose = new Pose2d(stackX, stackY, Math.toRadians(180)); //-54.5,-11.5
 
         // Define some custom constraints to use when wanting to go faster than defaults
-        speedUpVelocityConstraint = new TranslationalVelConstraint(75.0);
+        speedUpVelocityConstraint = new TranslationalVelConstraint(80.0);
         speedUpAccelerationConstraint = new ProfileAccelConstraint(-40.0, 60.0);
         slowDownVelocityConstraint = new TranslationalVelConstraint(5); 
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
-        drive = new MecanumDrive(hardwareMap, startPose);
+        drive = new MecanumDrive_Gertrude(hardwareMap, startPose);
         control.Init(hardwareMap);
         control.HuskyLensInit();
         control.HuskyLensInit2();
         //control.WebcamInit(hardwareMap);
         control.AutoStartPos();
         telemetry.update();
-        control.imuOffsetInDegrees = 90; // Math.toDegrees(startPose.heading.toDouble());
+        control.imuOffsetInDegrees = 270; // Math.toDegrees(startPose.heading.toDouble());
 
         while(!isStarted()){
-            control.DetectTeamArtRedBoard();
+            control.DetectTeamArtBlueBoard();
             telemetry.update();
         }
         resetRuntime();
@@ -73,7 +74,7 @@ public class RedBoardAlternate extends LinearOpMode {
         // ****  START DRIVING    ****************************
         // ***************************************************
 
-        RedBoardDecision();
+        BlueBoardDecision();
         /* Drive to the Board */
         Actions.runBlocking(
                 new SequentialAction(
@@ -93,13 +94,13 @@ public class RedBoardAlternate extends LinearOpMode {
         );
 
         /* Use AprilTags to Align Perfectly to the Board */
-        control.TagCorrection();
+      /*  control.TagCorrection();
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(new Vector2d(drive.pose.position.x + .5, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
                         .build());
-
+*/
         /* release pixels on the board using the distance sensor to know when to stop */
         control.StopNearBoardAuto(false);
 
@@ -112,14 +113,14 @@ public class RedBoardAlternate extends LinearOpMode {
         drive.updatePoseEstimate();
 
         /* Determine path to Floor Position */
-        RedRightPurplePixelDecision();
+        BlueBoardPurplePixelDecision();
 
         // Calculate the path from the floor Position to the Stack
         // Build up the Floor to Stack Trajectory
-        if (control.autoPosition == 1)
+        if (control.autoPosition == 3)
         {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .splineToLinearHeading(new Pose2d(12,wallDriveY, Math.toRadians(180)), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(12,wallDriveY), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(-12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(-36,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX + 1.0,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint, slowDownAccelerationConstraint)
@@ -127,15 +128,15 @@ public class RedBoardAlternate extends LinearOpMode {
                     .build();
 
         }
-        else if (control.autoPosition == 2){
+        else if (control.autoPosition == 2) {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
                     // turn and go through center rigging
-                    .strafeToLinearHeading(new Vector2d(18,stackY-1), Math.toRadians(270))
                     .turnTo(Math.toRadians(180))
-                    .strafeToLinearHeading(new Vector2d(-12,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-24,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-53,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(stackX+5,stackY), Math.toRadians(180),speedUpVelocityConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                     .build();
         }
         else
@@ -180,7 +181,7 @@ public class RedBoardAlternate extends LinearOpMode {
         drive.updatePoseEstimate();
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX-2,drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180), slowDownVelocityConstraint, slowDownAccelerationConstraint)
                         .build()
         );
 
@@ -190,35 +191,35 @@ public class RedBoardAlternate extends LinearOpMode {
 
         // Build up the Stack to Board Position 2 Trajectory
         //*****************************************************
-        if (control.autoPosition == 2){
+        if (control.autoPosition == 2) {
             BoardTraj2 = drive.actionBuilder(drive.pose)
-                    .strafeToLinearHeading(new Vector2d(-55, stackY-1), Math.toRadians(180),slowDownVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-24,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-12,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(12,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(24,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(46,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(47,stackY-1), Math.toRadians(180),slowDownVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-55, stackY), Math.toRadians(180),slowDownVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(-12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(46,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(47,stackY), Math.toRadians(180),slowDownVelocityConstraint)
                     // turn and go through center rigging
-                    // .turnTo(Math.toRadians(180))
-                    //  .strafeToLinearHeading(new Vector2d(-36,stackY), Math.toRadians(180),speedUpVelocityConstraint)
-                    // .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                   // .turnTo(Math.toRadians(180))
+                  //  .strafeToLinearHeading(new Vector2d(-36,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                   // .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
 
 
                     .build();
         }
         else {
-            BoardTraj2 = drive.actionBuilder(drive.pose)
+        BoardTraj2 = drive.actionBuilder(drive.pose)
                 .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackX + 1.0, wallDriveY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(-46,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(-12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(12,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(46,wallDriveY), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(46,-40), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(46,40), Math.toRadians(180), speedUpVelocityConstraint)
                 .build();
         }
-        // Pick up the White Pixels and then drive to position 3 (or 2), while lifting slides (after halfway)
+        // Pick up the White Pixels and then drive to position 1 (or 2), while lifting slides (after halfway)
         Actions.runBlocking(new SequentialAction(
                 positionArmWristToGrab(),
                 new SleepAction(.25),
@@ -226,13 +227,15 @@ public class RedBoardAlternate extends LinearOpMode {
                 new SleepAction(.25),
                 new ParallelAction(
                         new SequentialAction(
-                                pickUpWhitePixels(),
-                                new SleepAction(.3),
-                                servoOuttake()
+                                pickUpWhitePixels()//,
+                                //new SleepAction(.3)//,
+                                //servoOuttake()
                         ),
                         new SequentialAction(
                                 new SleepAction(.15),
-                                BoardTraj2
+                                new ParallelAction(BoardTraj2,
+                                        new SequentialAction(new SleepAction(.25), servoOuttake()))
+
                         ),
                         new SequentialAction(
                                 halfwayTrigger1b_raiseSlidesToAutoHeight(),
@@ -259,16 +262,18 @@ public class RedBoardAlternate extends LinearOpMode {
         if (control.autoPosition == 2) {
             // Build up the Board to Stack Trajectory (Second Stack Run)
             //*****************************************************
-            DriveBackToStack2 = drive.actionBuilder(drive.pose)
-                    // .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180), slowDownVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(44, stackY-1), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(24, stackY-1), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(12, stackY-1), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-12, stackY-1), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-24, stackY-1), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-53, stackY-1), Math.toRadians(180), speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
-                    .build();
+                DriveBackToStack2 = drive.actionBuilder(drive.pose)
+                       // .strafeToLinearHeading(new Vector2d(45, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(44, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(24, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(-12, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(-24, stackY), Math.toRadians(180), speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(stackX+5,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
+                        .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
+                        .build();
+
             Actions.runBlocking(
                     new SequentialAction(
                             new ParallelAction(
@@ -283,36 +288,36 @@ public class RedBoardAlternate extends LinearOpMode {
             );
             drive.updatePoseEstimate();
 
-            //control.StackCorrectionHL();
-            //drive.updatePoseEstimate();
-            /*Actions.runBlocking(
+            control.StackCorrectionHL();
+            drive.updatePoseEstimate();
+            Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .strafeToLinearHeading(new Vector2d(stackX, drive.pose.position.y - control.distanceCorrectionLR_HL), Math.toRadians(180))
+                            .strafeToLinearHeading(new Vector2d(stackX, drive.pose.position.y + control.distanceCorrectionLR_HL), Math.toRadians(180), slowDownVelocityConstraint, slowDownAccelerationConstraint)
                             .build()
             );
-            drive.updatePoseEstimate();*/
+            drive.updatePoseEstimate();
 
             //grab 2 more white pixels
             control.AutoPickupRoutineDrive(2.2);
             drive.updatePoseEstimate();
 
-            BoardTraj3 = drive.actionBuilder(drive.pose)
-                    .strafeToLinearHeading(new Vector2d(-55, stackY-1), Math.toRadians(180),slowDownVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-24,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(-12,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(12,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(24,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(46,stackY-1), Math.toRadians(180),speedUpVelocityConstraint)
-                    .strafeToLinearHeading(new Vector2d(47,stackY-1), Math.toRadians(180),slowDownVelocityConstraint)
-                    // turn and go through center rigging
-                    // .turnTo(Math.toRadians(180))
-                    //  .strafeToLinearHeading(new Vector2d(-36,stackY), Math.toRadians(180),speedUpVelocityConstraint)
-                    // .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                BoardTraj3 = drive.actionBuilder(drive.pose)
+                        .strafeToLinearHeading(new Vector2d(-55, stackY), Math.toRadians(180),slowDownVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(-24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(-12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(24,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(46,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        .strafeToLinearHeading(new Vector2d(47,stackY), Math.toRadians(180),slowDownVelocityConstraint)
+                        // turn and go through center rigging
+                        // .turnTo(Math.toRadians(180))
+                        //  .strafeToLinearHeading(new Vector2d(-36,stackY), Math.toRadians(180),speedUpVelocityConstraint)
+                        // .strafeToLinearHeading(new Vector2d(12,stackY), Math.toRadians(180),speedUpVelocityConstraint)
 
 
-                    .build();
+                        .build();
 
-            // Pick up the White Pixels and then drive to position 3 (or 2), while lifting slides (after halfway)
+            // Pick up the White Pixels and then drive to position 1 (or 2), while lifting slides (after halfway)
             Actions.runBlocking(new SequentialAction(
                             positionArmWristToGrab(),
                             new SleepAction(.25),
@@ -344,11 +349,11 @@ public class RedBoardAlternate extends LinearOpMode {
 
         /* Park the Robot, and Reset the Arm and slides */
         drive.updatePoseEstimate();
-        Park = drive.actionBuilder(drive.pose)
-                .lineToX(45, slowDownVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(46, -45), Math.toRadians(90))
-                .build();
-
+        /* Park the Robot, and Reset the Arm and slides */
+            Park = drive.actionBuilder(drive.pose)
+                    .lineToX(45, slowDownVelocityConstraint)
+                    .strafeToLinearHeading(new Vector2d(46, 45), Math.toRadians(270))
+                    .build();
         Actions.runBlocking(
                 new ParallelAction(
                         Park,
@@ -367,48 +372,43 @@ public class RedBoardAlternate extends LinearOpMode {
         telemetry.update();
 
     }
-    public void RedBoardDecision() {
+    public void BlueBoardDecision() {
         // Look for potential errors
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(46,-30,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,42,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(46,-42,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,30,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(46,-36,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(45,36,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(startPose)
-                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0))
+                .splineToLinearHeading(deliverToBoardPose, Math.toRadians(0), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                 .build();
     }
-    public void RedRightPurplePixelDecision() {
+    public void BlueBoardPurplePixelDecision() {
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(12, -35, Math.toRadians(0));
-            FloorTraj = drive.actionBuilder(deliverToBoardPose)
-                    .splineToLinearHeading(new Pose2d(27,-35, Math.toRadians(0)), Math.toRadians(180))
-                    //.setTangent(Math.toRadians(180))
-                    .lineToX(0)
-                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
-                    //.splineToLinearHeading(new Pose2d(0,-33, Math.toRadians(0)), Math.toRadians(0))
-                    //.splineToLinearHeading(deliverToFloorPose, Math.toRadians(0))
-                    .build();
-        }
-        else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(12, -36, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(10.5, 30, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(deliverToBoardPose)
                     .setTangent(Math.toRadians(180))
                     .splineToLinearHeading (deliverToFloorPose, Math.toRadians(180))
                     .build();
         }
+        else if (control.autoPosition == 3) {
+            deliverToFloorPose = new Pose2d(12, 30, Math.toRadians(0));
+            FloorTraj = drive.actionBuilder(deliverToBoardPose)
+                    .splineToLinearHeading(new Pose2d(12, deliverToFloorPose.position.y, Math.toRadians(0)), Math.toRadians(180))
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(0))
+                    .build();
+        }
         else {
-            deliverToFloorPose = new Pose2d(12, -38, Math.toRadians(270));
+            deliverToFloorPose = new Pose2d(12, 36, Math.toRadians(90));
             FloorTraj = drive.actionBuilder(drive.pose)
-                    .splineToLinearHeading(new Pose2d(12, -30, Math.toRadians(-90)), Math.toRadians(180))
-                   // .splineToLinearHeading(deliverToFloorPose, Math.toRadians(270))
+                    .splineToLinearHeading(new Pose2d(12, 30, Math.toRadians(90)), Math.toRadians(180))
                     .strafeTo(new Vector2d(deliverToFloorPose.position.x,deliverToFloorPose.position.y))
                     .build();
         }
