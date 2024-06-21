@@ -359,7 +359,7 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
             }
             packet.put("Slides Down", 0);
             boolean slidesAllDown = false;
-            return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
+            return slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
     public Action positionArmWristToGrab(){return new AutoGrab1();}

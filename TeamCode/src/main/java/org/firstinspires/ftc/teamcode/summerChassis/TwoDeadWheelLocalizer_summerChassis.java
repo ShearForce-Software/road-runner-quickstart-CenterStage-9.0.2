@@ -47,7 +47,7 @@ public final class TwoDeadWheelLocalizer_summerChassis implements Localizer {
         //   the encoders should be plugged into the slot matching the named motor
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
         par = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "leftFront_leftOdometry")));
-        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "rightFront_rightOdometry")));
+        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "rightRear")));
 
         par.setDirection(DcMotorEx.Direction.FORWARD);
         perp.setDirection(DcMotorEx.Direction.REVERSE);
