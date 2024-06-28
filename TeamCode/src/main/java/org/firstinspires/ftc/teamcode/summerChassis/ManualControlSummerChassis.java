@@ -50,8 +50,15 @@ public class ManualControlSummerChassis extends LinearOpMode {
                 // Drive Controls uses left_stick_y, left_stick_x, and right_stick_x
                 theRobot.driveControlsFieldCentric();
 
-                if (gamepad1.y) {
+                if (gamepad1.triangle) {
                     theRobot.imu.resetYaw();
+                }
+                if (gamepad1.square) {
+                    slides(-1);
+                }
+                telemetry.addData("Motor Ticks: ", slidesMotor.getCurrentPosition());
+                if (gamepad1.circle) {
+                    slides(1);
                 }
 
                 telemetry.update();
@@ -66,20 +73,11 @@ public class ManualControlSummerChassis extends LinearOpMode {
 
     }
     public void slides( double x){
+        slidesMotor.getCurrentPosition();
         newTarget = 103.6*x;
         slidesMotor.setTargetPosition((int) newTarget);
         slidesMotor.setPower(0.3);
         slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
-    public void controls() {
-
-        if (gamepad1.x) {
-            slides(1);
-        }
-        telemetry.addData("Motor Ticks: ", slidesMotor.getCurrentPosition());
-        if (gamepad1.triangle) {
-            slides(2);
-        }
     }
 
 }
