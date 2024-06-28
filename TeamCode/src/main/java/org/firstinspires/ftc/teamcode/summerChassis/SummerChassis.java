@@ -185,7 +185,8 @@ public class SummerChassis {
         IsFieldCentric = fieldCentricEnabled;
     }
     public void SpecialSleep(long milliseconds) {
-        for (long stop = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(milliseconds); stop > System.nanoTime(); ) {
+        for (long stop = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(milliseconds);
+             stop > System.nanoTime(); ) {
             if (!opMode.opModeIsActive() || opMode.isStopRequested()) return;
             if (IsDriverControl) {
                 if (IsFieldCentric) driveControlsFieldCentric();
