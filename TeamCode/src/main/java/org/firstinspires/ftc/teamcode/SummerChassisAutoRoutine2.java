@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.summerChassis;
+package org.firstinspires.ftc.teamcode;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -17,13 +17,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.summerChassis.SummerChassis;
+import org.firstinspires.ftc.teamcode.SummerChassis2;
 
 //@Disabled
-@Autonomous(name="Summer Chassis Auto", preselectTeleOp = "ManualControlSummerChassis")
-public class SummerChassisAutoRoutine extends LinearOpMode {
-    SummerChassis control = new SummerChassis(true, false,this);
-    MecanumDrive_summerChassis drive;
+@Autonomous(name="Summer Chassis Auto2", preselectTeleOp = "ManualControlSummerChassis")
+public class SummerChassisAutoRoutine2 extends LinearOpMode {
+    SummerChassis2 control = new SummerChassis2(true, false,this);
+    MecanumDrive drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
@@ -51,7 +51,7 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
-        drive = new MecanumDrive_summerChassis(hardwareMap, startPose);
+        drive = new MecanumDrive(hardwareMap, startPose);
         control.Init(hardwareMap);
         telemetry.update();
         control.imuOffsetInDegrees = 270; // Math.toDegrees(startPose.heading.toDouble());
@@ -359,7 +359,7 @@ public class SummerChassisAutoRoutine extends LinearOpMode {
             }
             packet.put("Slides Down", 0);
             boolean slidesAllDown = false;
-            return slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
+            return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
     public Action positionArmWristToGrab(){return new AutoGrab1();}

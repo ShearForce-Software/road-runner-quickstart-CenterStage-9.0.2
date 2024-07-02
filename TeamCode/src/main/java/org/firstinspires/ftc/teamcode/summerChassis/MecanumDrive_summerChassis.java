@@ -41,6 +41,7 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.VoltageSensor;
@@ -69,13 +70,13 @@ public final class MecanumDrive_summerChassis {
                 RevHubOrientationOnRobot.UsbFacingDirection.LEFT;
 
         // drive model parameters
-        public double inPerTick = .000745;
-        public double lateralInPerTick = 0.0005105668456095841;
-        public double trackWidthTicks = 18959;//15548.620725915256;
+        public double inPerTick = .000756;
+        public double lateralInPerTick = 0.000570261594370559;
+        public double trackWidthTicks = 15985.855585854693;//15548.620725915256;
 
         // feedforward parameters (in tick units)
-        public double kS = 1.2407432974715604;
-        public double kV = 0.00010294214063294827;
+        public double kS = 0.6497006489935595;
+        public double kV = 0.00014050494245645588;
         public double kA = 0.000009;
 
         // path profile parameters (in inches)
@@ -88,9 +89,9 @@ public final class MecanumDrive_summerChassis {
         public double maxAngAccel = Math.PI*.8;
 
         // path controller gains
-        public double axialGain = 8;
-        public double lateralGain = 6.5;
-        public double headingGain = 8; // shared with turn //10 //15
+        public double axialGain = 10;
+        public double lateralGain = 8;
+        public double headingGain = 10; // shared with turn //10 //15
         public double axialVelGain = 0.0;
         public double lateralVelGain = 0.0;
         public double headingVelGain = 0.0; // shared with turn
@@ -148,7 +149,8 @@ public final class MecanumDrive_summerChassis {
             imu = lazyImu.get();
 
             // reverse encoders if needed
-            //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+               rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+               rightBack.setDirection(DcMotorSimple.Direction.REVERSE);
         }
 
         @Override
@@ -248,8 +250,8 @@ public final class MecanumDrive_summerChassis {
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
-        //localizer = new ThreeDeadWheelLocalizer(hardwareMap, MecanumDrive.PARAMS.inPerTick);
-        localizer = new TwoDeadWheelLocalizer_summerChassis(hardwareMap, lazyImu.get(), MecanumDrive_summerChassis.PARAMS.inPerTick);
+        localizer = new ThreeDeadWheelLocalizer_summerChassis(hardwareMap, MecanumDrive_summerChassis.PARAMS.inPerTick);
+        //localizer = new TwoDeadWheelLocalizer_summerChassis(hardwareMap, lazyImu.get(), MecanumDrive_summerChassis.PARAMS.inPerTick);
 
         FlightRecorder.write("MECANUM_PARAMS", PARAMS);
     }
