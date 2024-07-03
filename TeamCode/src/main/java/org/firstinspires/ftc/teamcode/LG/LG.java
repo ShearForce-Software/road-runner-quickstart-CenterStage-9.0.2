@@ -1,36 +1,20 @@
-package org.firstinspires.ftc.teamcode.summerChassis;
+package org.firstinspires.ftc.teamcode.LG;
 
-import static org.firstinspires.ftc.teamcode.summerChassis.MecanumDrive_summerChassis.PARAMS;
+import static org.firstinspires.ftc.teamcode.LG.MecanumDrive_LG.PARAMS;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Config
-public class SummerChassis {
+public class LG {
     LinearOpMode opMode;
     DcMotor leftFront;
     DcMotor leftRear;
@@ -42,7 +26,7 @@ public class SummerChassis {
 
     boolean IsDriverControl;
     boolean IsFieldCentric;
-    int autoPosition;
+    int autoposition;
     final double SPEED_GAIN  =  0.02  ;   //  Forward Speed Control "Gain". eg: Ramp up to 50% power at a 25 inch error.   (0.50 / 25.0)
     final double STRAFE_GAIN =  0.015 ;   //  Strafe Speed Control "Gain".  eg: Ramp up to 25% power at a 25 degree Yaw error.   (0.25 / 25.0)
     final double TURN_GAIN   =  0.01  ;   //  Turn Control "Gain".  eg: Ramp up to 25% power at a 25 degree error. (0.25 / 25.0)
@@ -52,7 +36,7 @@ public class SummerChassis {
     public static boolean allianceColorIsBlue = false;
     public static double autoTimeLeft = 0.0;
 
-    public SummerChassis(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
+    public LG(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
         this.IsFieldCentric = isFieldCentric;
         this.opMode = opMode;
