@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.LG;
 import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -16,14 +16,14 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.SummerChassis2;
+import org.firstinspires.ftc.teamcode.summerChassis.MecanumDrive_summerChassis;
+import org.firstinspires.ftc.teamcode.summerChassis.SummerChassis;
 
 //@Disabled
-@Autonomous(name="Summer Chassis Auto2", preselectTeleOp = "ManualControlSummerChassis")
-public class SummerChassisAutoRoutine2 extends LinearOpMode {
-    SummerChassis2 control = new SummerChassis2(true, false,this);
-    MecanumDrive drive;
+@Autonomous(name="LG Auto", preselectTeleOp = "ManualControlLG")
+public class LGAutoRoutine extends LinearOpMode {
+    LG control = new LG(true, false,this);
+    MecanumDrive_summerChassis drive;
     Pose2d startPose;
     Pose2d deliverToFloorPose;
     Pose2d deliverToBoardPose;
@@ -51,7 +51,7 @@ public class SummerChassisAutoRoutine2 extends LinearOpMode {
         slowDownAccelerationConstraint = new ProfileAccelConstraint(-20, 50);
 
         /* Initialize the Robot */
-        drive = new MecanumDrive(hardwareMap, startPose);
+        drive = new MecanumDrive_summerChassis(hardwareMap, startPose);
         control.Init(hardwareMap);
         telemetry.update();
         control.imuOffsetInDegrees = 270; // Math.toDegrees(startPose.heading.toDouble());
@@ -64,7 +64,7 @@ public class SummerChassisAutoRoutine2 extends LinearOpMode {
         control.autoTimeLeft = 0.0;
 
         // Create the floor to Stack trajectory
-        if(control.autoPosition==1) {
+        if(control.autoposition==1) {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
                     .strafeToLinearHeading(new Vector2d(stackX + 5, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180), null, slowDownAccelerationConstraint)
@@ -266,11 +266,11 @@ public class SummerChassisAutoRoutine2 extends LinearOpMode {
 
     public void BlueBoardDecision() {
         //***POSITION 1***
-        if (control.autoPosition == 1) {
+        if (control.autoposition == 1) {
             deliverToBoardPose = new Pose2d(46,39,Math.toRadians(180));
         }
         //***POSITION 3***
-        else if (control.autoPosition == 3) {
+        else if (control.autoposition == 3) {
             deliverToBoardPose = new Pose2d(46,27,Math.toRadians(180));
         }
         //***POSITION 2***
@@ -288,7 +288,7 @@ public class SummerChassisAutoRoutine2 extends LinearOpMode {
     }
     public void BlueRightPurplePixelDecision() {
         //***POSITION 1***
-        if (control.autoPosition == 1) {
+        if (control.autoposition == 1) {
             deliverToFloorPose = new Pose2d(-37, 31, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
@@ -297,7 +297,7 @@ public class SummerChassisAutoRoutine2 extends LinearOpMode {
                     .build();
         }
         //***POSITION 3***
-        else if (control.autoPosition == 3) {
+        else if (control.autoposition == 3) {
             deliverToFloorPose = new Pose2d(-37.5, 22.5, Math.toRadians(315));
             FloorTraj = drive.actionBuilder(startPose)
                     .splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
@@ -359,7 +359,7 @@ public class SummerChassisAutoRoutine2 extends LinearOpMode {
             }
             packet.put("Slides Down", 0);
             boolean slidesAllDown = false;
-            return !slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
+            return slidesAllDown;  // returning true means not done, and will be called again.  False means action is completely done
         }
     }
     public Action positionArmWristToGrab(){return new AutoGrab1();}
