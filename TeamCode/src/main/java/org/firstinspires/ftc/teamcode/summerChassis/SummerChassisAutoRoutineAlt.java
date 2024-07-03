@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 //@Disabled
-@Autonomous(name="Summer Chassis Auto Alt", preselectTeleOp = "ManualControlSummerChassis")
+@Autonomous(name="Summer Chassis Auto Alt", preselectTeleOp = "1 Manual Control Summer Chassis")
 public class SummerChassisAutoRoutineAlt extends LinearOpMode {
     SummerChassis control = new SummerChassis(true, false,this);
     MecanumDrive_summerChassis drive;
@@ -38,7 +38,7 @@ public class SummerChassisAutoRoutineAlt extends LinearOpMode {
     double stackX = -59.0;
 
     public void runOpMode(){
-        startPose = new Pose2d(-36,62.5,Math.toRadians(270));
+        startPose = new Pose2d(-36,-62.5,Math.toRadians(90));
         stackPose = new Pose2d(stackX, stackY, Math.toRadians(180)); //-54.5,-11.5
 
         // Define some custom constraints to use when wanting to go faster than defaults
@@ -61,14 +61,14 @@ public class SummerChassisAutoRoutineAlt extends LinearOpMode {
         control.autoTimeLeft = 0.0;
 
         // Create the floor to Stack trajectory
-        if(control.autoPosition==1) {
+        // if(control.autoPosition==1) {
             DriveToStack = drive.actionBuilder(deliverToFloorPose)
-                    .strafeToLinearHeading(new Vector2d(-39, -50), Math.toRadians(0))
+                    .strafeToLinearHeading(new Vector2d(-39, -50), Math.toRadians(180))
                     .splineToLinearHeading(new Pose2d(stackX+5, stackY, Math.toRadians(180)), Math.toRadians(0), null, slowDownAccelerationConstraint)
                     .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
                     .strafeToLinearHeading(new Vector2d(stackX-2, stackY), Math.toRadians(180), slowDownVelocityConstraint)
                     .build();
-        }
+        //}
 
         // ***************************************************
         // ****  START DRIVING    ****************************
@@ -156,11 +156,11 @@ public class SummerChassisAutoRoutineAlt extends LinearOpMode {
         // **********************************************************
         drive.updatePoseEstimate();
         DriveBackToStack = drive.actionBuilder(drive.pose)
-                .strafeToLinearHeading(new Vector2d(30, 58), Math.toRadians(180))
-                .strafeToLinearHeading(new Vector2d(12, 58), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-12, 58), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-36, 58), Math.toRadians(180), speedUpVelocityConstraint)
-                .strafeToLinearHeading(new Vector2d(-52, 58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(30, -58), Math.toRadians(180))
+                .strafeToLinearHeading(new Vector2d(12, -58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-12, -58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-36, -58), Math.toRadians(180), speedUpVelocityConstraint)
+                .strafeToLinearHeading(new Vector2d(-52, -58), Math.toRadians(180), speedUpVelocityConstraint)
                 .strafeToLinearHeading(new Vector2d(stackX+5, stackY), Math.toRadians(180))
                 .strafeToLinearHeading(new Vector2d(stackX, stackY), Math.toRadians(180))
                 .build();
@@ -258,15 +258,15 @@ public class SummerChassisAutoRoutineAlt extends LinearOpMode {
     public void BlueBoardDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToBoardPose = new Pose2d(46,39,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-27,Math.toRadians(180));
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToBoardPose = new Pose2d(46,27,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-39,Math.toRadians(180));
         }
         //***POSITION 2***
         else {
-            deliverToBoardPose = new Pose2d(46,33,Math.toRadians(180));
+            deliverToBoardPose = new Pose2d(46,-33,Math.toRadians(180));
         }
         BoardTraj2 = drive.actionBuilder(drive.pose)
                 .strafeToLinearHeading(new Vector2d(stackX + 1.0, stackY), Math.toRadians(180), slowDownVelocityConstraint)
@@ -280,7 +280,7 @@ public class SummerChassisAutoRoutineAlt extends LinearOpMode {
     public void BlueRightPurplePixelDecision() {
         //***POSITION 1***
         if (control.autoPosition == 1) {
-            deliverToFloorPose = new Pose2d(-37, 31, Math.toRadians(180));
+            deliverToFloorPose = new Pose2d(-33, -30, Math.toRadians(0));
             FloorTraj = drive.actionBuilder(startPose)
                     //.splineToLinearHeading(new Pose2d(-38.5, 35.5, Math.toRadians(270)), Math.toRadians(270))
                     //.strafeToLinearHeading(new Vector2d(-31, 34), Math.toRadians(180))
@@ -290,18 +290,18 @@ public class SummerChassisAutoRoutineAlt extends LinearOpMode {
         }
         //***POSITION 3***
         else if (control.autoPosition == 3) {
-            deliverToFloorPose = new Pose2d(-37.5, 22.5, Math.toRadians(315));
+            deliverToFloorPose = new Pose2d(-36, -34.5, Math.toRadians(180));
             FloorTraj = drive.actionBuilder(startPose)
                     //.splineToLinearHeading(new Pose2d(-38.5, 33, Math.toRadians(270)), Math.toRadians(270))
                     //.splineToLinearHeading (deliverToFloorPose, Math.toRadians(315))
-                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(270), speedUpVelocityConstraint, slowDownAccelerationConstraint)
+                    .splineToLinearHeading(new Pose2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y, Math.toRadians(180)), Math.toRadians(0), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .build();
         }
         //***POSITION 2***
         else {
-            deliverToFloorPose = new Pose2d(-46.5, 15.5, Math.toRadians(225));
+            deliverToFloorPose = new Pose2d(-36, -37.5, Math.toRadians(270));
             FloorTraj = drive.actionBuilder(startPose)
-                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(225))
+                    .strafeToLinearHeading(new Vector2d(deliverToFloorPose.position.x, deliverToFloorPose.position.y), Math.toRadians(270), speedUpVelocityConstraint, slowDownAccelerationConstraint)
                     .build();
         }
     }
