@@ -21,6 +21,11 @@ public class LG {
     DcMotor rightFront;
     DcMotor rightRear;
 
+    DcMotor slidesMotor;
+    double ticks = 103.6;
+    double newTarget;
+    double motorpower =0.0;
+
     IMU imu;
     public double imuOffsetInDegrees;
 
@@ -42,13 +47,15 @@ public class LG {
         this.opMode = opMode;
     }
     public void Init (HardwareMap hardwareMap) {
-        leftFront = hardwareMap.get(DcMotor.class, "leftFront_leftOdometry");
+        leftFront = hardwareMap.get(DcMotor.class, "leftFront");
         leftRear = hardwareMap.get(DcMotor.class, "leftRear");
-        rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
+        rightFront = hardwareMap.get(DcMotor.class, "rightFront");
         rightRear = hardwareMap.get(DcMotor.class, "rightRear");
+        slidesMotor = hardwareMap.get(DcMotor.class, "slidesMotor");
 
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -178,5 +185,11 @@ public class LG {
             }
         }
     }
-
+    public void slides( double x){
+        slidesMotor.getCurrentPosition();
+        newTarget = 103.6*x;
+        slidesMotor.setTargetPosition((int) newTarget);
+        slidesMotor.setPower(motorpower);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
 }
