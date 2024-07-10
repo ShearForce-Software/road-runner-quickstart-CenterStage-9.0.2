@@ -36,6 +36,7 @@ public class SummerChassis {
     DcMotor leftRear;
     DcMotor rightFront;
     DcMotor rightRear;
+    DcMotor slidesMotor;
 
     IMU imu;
     public double imuOffsetInDegrees;
@@ -52,6 +53,9 @@ public class SummerChassis {
     public static boolean allianceColorIsBlue = false;
     public static double autoTimeLeft = 0.0;
 
+    public double newTarget;
+    public double motorpower = 0.0;
+
     public SummerChassis(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
         this.IsFieldCentric = isFieldCentric;
@@ -62,6 +66,7 @@ public class SummerChassis {
         leftRear = hardwareMap.get(DcMotor.class, "leftRear");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
         rightRear = hardwareMap.get(DcMotor.class, "rightRear");
+        slidesMotor = hardwareMap.get(DcMotor.class, "slidesMotor");
 
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
@@ -193,6 +198,20 @@ public class SummerChassis {
                 if (!IsFieldCentric) driveControlsRobotCentric();
             }
         }
+    }
+    public void slides( double x){
+        slidesMotor.getCurrentPosition();
+        newTarget = 103.6*x;
+        slidesMotor.setTargetPosition((int) newTarget);
+        slidesMotor.setPower(motorpower);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void setslidePower (double power) {
+        slidesMotor.setPower(power);
+        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
     }
 
 }
