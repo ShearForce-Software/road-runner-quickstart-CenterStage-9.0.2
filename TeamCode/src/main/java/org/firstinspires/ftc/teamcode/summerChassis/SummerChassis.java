@@ -36,8 +36,8 @@ public class SummerChassis {
     DcMotor leftRear;
     DcMotor rightFront;
     DcMotor rightRear;
-    DcMotor slidesMotor;
-
+  //  DcMotor slidesMotor;
+  // slidesMotor was commented out to allow SummerChassis to be calibrated
     IMU imu;
     public double imuOffsetInDegrees;
 
@@ -66,7 +66,7 @@ public class SummerChassis {
         leftRear = hardwareMap.get(DcMotor.class, "leftRear");
         rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
         rightRear = hardwareMap.get(DcMotor.class, "rightRear");
-        slidesMotor = hardwareMap.get(DcMotor.class, "slidesMotor");
+        //  slidesMotor = hardwareMap.get(DcMotor.class, "slidesMotor");
 
         rightFront.setDirection(DcMotor.Direction.REVERSE);
         rightRear.setDirection(DcMotor.Direction.REVERSE);
@@ -199,7 +199,7 @@ public class SummerChassis {
             }
         }
     }
-    public void slides( double x){
+   /* public void slides( double x){
         slidesMotor.getCurrentPosition();
         newTarget = 103.6*x;
         slidesMotor.setTargetPosition((int) newTarget);
@@ -213,5 +213,5 @@ public class SummerChassis {
 
 
     }
-
+*/
 }
