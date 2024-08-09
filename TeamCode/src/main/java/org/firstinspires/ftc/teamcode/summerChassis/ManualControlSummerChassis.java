@@ -49,7 +49,7 @@ public class ManualControlSummerChassis extends LinearOpMode {
                 if (gamepad1.triangle) {
                     theRobot.imu.resetYaw();
                 }
-                if (gamepad1.square) {
+               /* if (gamepad1.square) {
                     theRobot.setslidePower(1);
                 }
                 else if (gamepad1.circle) {
@@ -60,6 +60,8 @@ public class ManualControlSummerChassis extends LinearOpMode {
                     theRobot.slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     theRobot.motorpower = 0.1;
                     telemetry.addData("Touch Sensor", "starting motor");
+
+
                 }
                 else if (touchSensor.isPressed()) {
                     telemetry.addData("Touch Sensor", "Is Pressed");
@@ -68,8 +70,12 @@ public class ManualControlSummerChassis extends LinearOpMode {
                     telemetry.addData("Touch Sensor", "Is Not Pressed");
                     theRobot.setslidePower(0);
                 }
+
+
                // theRobot.slidesMotor.setPower(theRobot.motorpower);
                 telemetry.addData("Motor Ticks: ", theRobot.slidesMotor.getCurrentPosition());
+
+                */
 
                 telemetry.update();
             } // end while (opModeIsActive())
