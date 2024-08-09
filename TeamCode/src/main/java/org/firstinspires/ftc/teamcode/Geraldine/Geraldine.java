@@ -1,45 +1,42 @@
-package org.firstinspires.ftc.teamcode.summerChassis;
+package org.firstinspires.ftc.teamcode.Geraldine;
 
 import static org.firstinspires.ftc.teamcode.summerChassis.MecanumDrive_summerChassis.PARAMS;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.hardware.dfrobot.HuskyLens;
-import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.hardware.rev.RevColorSensorV3;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.util.Range;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.firstinspires.ftc.vision.tfod.TfodProcessor;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Config
-public class SummerChassis {
+public class Geraldine {
     LinearOpMode opMode;
-    DcMotor leftFront;
-    DcMotor leftRear;
-    DcMotor rightFront;
-    DcMotor rightRear;
-  //  DcMotor slidesMotor;
-  // slidesMotor was commented out to allow SummerChassis to be calibrated
+    DcMotor leftFrontDrive;
+    DcMotor leftBackDrive;
+    DcMotor rightFrontDrive;
+    DcMotor rightBackDrive;
+    DcMotor wheel;
+    DcMotorSimple lift;
+    CRServo left_mouth;
+    CRServo right_mouth;
+    DigitalChannel right_swivel;
+    DigitalChannel left_swivel;
+    DigitalChannel low_arm;
+    DigitalChannel high_arm;
     IMU imu;
+    ElapsedTime runtime = new ElapsedTime();
     public double imuOffsetInDegrees;
+
+    double scale_drive = .33;
 
     boolean IsDriverControl;
     boolean IsFieldCentric;
@@ -56,20 +53,29 @@ public class SummerChassis {
     public double newTarget;
     public double motorpower = 0.0;
 
-    public SummerChassis(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
+    public Geraldine(boolean isDriverControl, boolean isFieldCentric, LinearOpMode opMode) {
         this.IsDriverControl = isDriverControl;
         this.IsFieldCentric = isFieldCentric;
         this.opMode = opMode;
     }
     public void Init (HardwareMap hardwareMap) {
-        leftFront = hardwareMap.get(DcMotor.class, "leftFront_leftOdometry");
-        leftRear = hardwareMap.get(DcMotor.class, "leftRear");
-        rightFront = hardwareMap.get(DcMotor.class, "rightFront_rightOdometry");
-        rightRear = hardwareMap.get(DcMotor.class, "rightRear");
-        //  slidesMotor = hardwareMap.get(DcMotor.class, "slidesMotor");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "leftFront");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "leftBack");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "rightFront");
+        rightBackDrive = hardwareMap.get(DcMotor.class, "rightBack");
+        wheel = hardwareMap.get(DcMotor.class, "wheel");
+        lift = hardwareMap.get(DcMotorSimple.class, "lift");
+        //Touch sensors below
+        right_swivel = hardwareMap.get(DigitalChannel.class, "right_swivel");
+        left_swivel = hardwareMap.get(DigitalChannel.class, "left_swivel");
+        low_arm = hardwareMap.get(DigitalChannel.class, "low_arm");
+        high_arm = hardwareMap.get(DigitalChannel.class, "high_arm");
 
-        rightFront.setDirection(DcMotor.Direction.REVERSE);
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        left_mouth = hardwareMap.get(CRServo.class, "left_mouth");
+        right_mouth = hardwareMap.get(CRServo.class, "right_mouth");
+        rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        lift.setDirection(DcMotorSimple.Direction.REVERSE);
 
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
@@ -100,10 +106,10 @@ public class SummerChassis {
         }
 
         // Send powers to the wheels.
-        leftFront.setPower(leftFrontPower *.5);
-        rightFront.setPower(rightFrontPower *.5);
-        leftRear.setPower(leftBackPower *.5);
-        rightRear.setPower(rightBackPower *.5);
+        leftFrontDrive.setPower(leftFrontPower *.5);
+        rightFrontDrive.setPower(rightFrontPower *.5);
+        leftBackDrive.setPower(leftBackPower *.5);
+        rightBackDrive.setPower(rightBackPower *.5);
 
       //  opMode.telemetry.addData("Claw Distance: ", clawDistanceSensor.getDistance(DistanceUnit.MM));
       //  opMode.telemetry.update();
@@ -126,10 +132,10 @@ public class SummerChassis {
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
 
-        leftFront.setPower(frontLeftPower);
-        leftRear.setPower(backLeftPower);
-        rightFront.setPower(frontRightPower);
-        rightRear.setPower(backRightPower);
+        leftFrontDrive.setPower(frontLeftPower);
+        leftBackDrive.setPower(backLeftPower);
+        rightFrontDrive.setPower(frontRightPower);
+        rightBackDrive.setPower(backRightPower);
     }
     public void driveControlsRobotCentricKID() {
         double y = -opMode.gamepad2.left_stick_y;
@@ -142,10 +148,10 @@ public class SummerChassis {
         double frontRightPower = (y - x - rx) / denominator;
         double backRightPower = (y + x - rx) / denominator;
 
-        leftFront.setPower(frontLeftPower*.25);
-        leftRear.setPower(backLeftPower*.25);
-        rightFront.setPower(frontRightPower*.25);
-        rightRear.setPower(backRightPower*.25);
+        leftFrontDrive.setPower(frontLeftPower*.25);
+        leftBackDrive.setPower(backLeftPower*.25);
+        rightFrontDrive.setPower(frontRightPower*.25);
+        rightBackDrive.setPower(backRightPower*.25);
     }
 
     public double GetIMU_HeadingInDegrees()
@@ -173,10 +179,10 @@ public class SummerChassis {
         double frontRightPower = (rotY - rotX - rx) / denominator;
         double backRightPower = (rotY + rotX - rx) / denominator;
 
-        leftFront.setPower(frontLeftPower*1.0);
-        leftRear.setPower(backLeftPower*1.0);
-        rightFront.setPower(frontRightPower*1.0);
-        rightRear.setPower(backRightPower*1.0);
+        leftFrontDrive.setPower(frontLeftPower);
+        leftBackDrive.setPower(backLeftPower);
+        rightFrontDrive.setPower(frontRightPower);
+        rightBackDrive.setPower(backRightPower);
     }
     public void RunDriveControls() {
         if (IsFieldCentric) {
@@ -199,19 +205,16 @@ public class SummerChassis {
             }
         }
     }
-   /* public void slides( double x){
-        slidesMotor.getCurrentPosition();
-        newTarget = 103.6*x;
-        slidesMotor.setTargetPosition((int) newTarget);
-        slidesMotor.setPower(motorpower);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    public void wheel( double x){
+        wheel.getCurrentPosition();
+        // Add code to make the horizontal wheel spin
     }
 
     public void setslidePower (double power) {
-        slidesMotor.setPower(power);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        wheel.setPower(power);
+        wheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
     }
-*/
+
 }

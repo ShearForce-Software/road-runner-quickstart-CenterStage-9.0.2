@@ -11,15 +11,9 @@ import org.firstinspires.ftc.teamcode.summerChassis.SummerChassis;
 
 @TeleOp(name = "1 Manual Control Summer Chassis")
 public class ManualControlSummerChassis extends LinearOpMode {
-    DcMotor slidesMotor;
+
     double ticks = 103.6;
-    double newTarget;
-    double motorpower =0.0;
-    public void Init(HardwareMap hardwareMap) {
-        slidesMotor = hardwareMap.get(DcMotor.class, "leftFront_leftOdometry");
-        telemetry.addData("Hardware: ", "Initialized");
-        slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
+
 
     public void runOpMode() {
 
@@ -29,7 +23,7 @@ public class ManualControlSummerChassis extends LinearOpMode {
         TouchSensor touchSensor;
         theRobot.Init(this.hardwareMap);
         touchSensor = hardwareMap.get(TouchSensor.class, "sensor_touch");
-        Init(this.hardwareMap);
+
 
 
 
@@ -56,25 +50,26 @@ public class ManualControlSummerChassis extends LinearOpMode {
                     theRobot.imu.resetYaw();
                 }
                 if (gamepad1.square) {
-                    slides(-1);
+                    theRobot.setslidePower(1);
                 }
                 else if (gamepad1.circle) {
-                    slides(1);
+                    theRobot.setslidePower(-1);
                 }
                 else if (gamepad2.circle) {
                     //slidesMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-                   motorpower = 0.3;
+                    theRobot.slidesMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                    theRobot.motorpower = 0.1;
                     telemetry.addData("Touch Sensor", "starting motor");
                 }
                 else if (touchSensor.isPressed()) {
                     telemetry.addData("Touch Sensor", "Is Pressed");
-                    motorpower = 0.0;
+                    theRobot.motorpower = 0.0;
                 } else {
                     telemetry.addData("Touch Sensor", "Is Not Pressed");
+                    theRobot.setslidePower(0);
                 }
-                slidesMotor.setPower(motorpower);
-                telemetry.addData("Motor Ticks: ", slidesMotor.getCurrentPosition());
+               // theRobot.slidesMotor.setPower(theRobot.motorpower);
+                telemetry.addData("Motor Ticks: ", theRobot.slidesMotor.getCurrentPosition());
 
                 telemetry.update();
             } // end while (opModeIsActive())
@@ -87,13 +82,7 @@ public class ManualControlSummerChassis extends LinearOpMode {
         }
 
     }
-    public void slides( double x){
-        slidesMotor.getCurrentPosition();
-        newTarget = 103.6*x;
-        slidesMotor.setTargetPosition((int) newTarget);
-        slidesMotor.setPower(motorpower);
-        slidesMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-    }
+
 
 
 }
